@@ -1,0 +1,53 @@
+{
+  "name": "Hubspot",
+  "description": "Sync a Hubspot Channel whenever a User enters or leaves a Segment",
+  "tags": ["outgoing", "oneColumn"],
+  "admin" : "/auth/",
+  "picture": "picture.png",
+  "version": "0.0.1",
+  "settings": [],
+  "private_settings":[ 
+    {
+      "name": "synchronized_segments",
+      "title": "Segments",
+      "description": "Post to Hubspot when users match these segments (Empty to send everyone)",
+      "default": [],
+      "type": "array",
+      "format": "segment"
+    },
+    {
+      "name"        : "traits",
+      "title"       : "Synchronized Properties",
+      "description" : "Synchronize these properties to Hubspot",
+      "type"        : "array",
+      "format"      : "trait"
+    },
+    {
+      "name": "token",
+      "title": "Token",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
+      "name": "portal_id",
+      "title": "Token",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
+      "name": "refresh_token",
+      "title": "RefreshToken",
+      "type": "string",
+      "format": "hidden"
+    }
+  ],
+  "deployment_settings": [],
+  "resources": [],
+  "readme": "readme.md",
+  "ui": false,
+  "subscriptions": [
+    {
+      "url": "/notify"
+    }
+  ]
+}
