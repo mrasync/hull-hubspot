@@ -1,9 +1,32 @@
 {
-  "name": "Hull Slack Connector",
-  "description": "Sends Hull User changes to Slack.",
-  "repository": "https://github.com/hull-ships/hull-slack",
+  "name": "Hull Hubspot Connector",
+  "description": "Syncs Hull from/to Hubspot.",
+  "repository": "https://github.com/hull-ships/hull-hubspot",
   "website": "http://www.hull.io",
   "success_url": "/readme",
-  "env": {},
+  "env": {
+    "SECRET" : {
+      "description" : "A Secret key used to sign tokens",
+      "generator" : "secret"
+    },
+    "LOG_LEVEL" : {
+      "description" : "Logging level (emerg, alert, crit, error, warning, notice, info, debug)",
+      "value": "info"
+    },
+    "LOGSTASH_PORT" : {
+      "description" : "Logstash Port"
+    },
+    "LOGSTASH_HOST" : {
+      "description" : "Logstash Host"
+    },
+    "CLIENT_ID" : {
+      "description" : "oAuth Client ID",
+      "required": true
+    },
+    "CLIENT_SECRET" : {
+      "description" : "oAuth Client Secret",
+      "required": true
+    }
+  },
   "scripts": {}
 }

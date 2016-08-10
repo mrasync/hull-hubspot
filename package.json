@@ -1,8 +1,8 @@
 {
-  "name": "hull-slack",
-  "description": "Send Notification of User events and segments to Slack",
+  "name": "hull-hubspot",
+  "description": "Send Notification of User events and segments to Hubspot",
   "version": "0.0.2",
-  "homepage": "https://github.com/hull-ships/hull-slack",
+  "homepage": "https://github.com/hull-ships/hull-hubspot",
   "license": "MIT",
   "main": "bin/start",
   "author": {
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hull-ships/hull-slack"
+    "url": "git://github.com/hull-ships/hull-hubspot"
   },
   "bugs": {
-    "url": "https://github.com/hull-ships/hull-slack/issues"
+    "url": "https://github.com/hull-ships/hull-hubspot/issues"
   },
   "scripts": {
     "build": "npm run clean && npm run build:server",
@@ -42,7 +42,7 @@
     "integration",
     "user",
     "sync",
-    "slack"
+    "hubspot"
   ],
   "devDependencies": {
     "babel-core": "^6.13.2",
@@ -63,12 +63,14 @@
     "dotenv": "^2.0.0",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
+    "hubspot": "unity/node-hubspot",
     "hull": "0.9.6",
     "lodash": "^4.14.2",
     "moment": "^2.14.1",
-    "hubspot": "unity/node-hubspot",
+    "newrelic": "^1.29.0",
     "passport-hubspot": "unity/passport-hubspot",
     "rimraf": "^2.5.4",
+    "winston-logstash": "^0.2.11",
     "winston-logzio": "^1.0.0"
   }
 }

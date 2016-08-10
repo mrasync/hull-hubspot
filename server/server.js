@@ -80,7 +80,7 @@ module.exports = function Server(options = {}) {
 
   app.listen(port);
 
-  Hull.logger.info("started", { port });
+  Hull.logger.info("hubspot.started", { port });
 
   return app;
 };

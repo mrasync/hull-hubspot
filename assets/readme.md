@@ -1,12 +1,12 @@
-# Hull + Slack
+# Hull + Hubspot
 
-This Ship notifies you on Slack when a Customer signs up, updates, enters or leaves a segment, and sends Daily, Weekly and Montly Organization reports to your Slack Channel
+This Ship notifies you on Hubspot when a Customer signs up, updates, enters or leaves a segment, and sends Daily, Weekly and Montly Organization reports to your Hubspot Channel
 
 ####  To install:
 
-- Click the "Connect to Slack" button on the Dashboard page,
+- Click the "Connect to Hubspot" button on the Dashboard page,
 
-- Authorize Slack to access your account, pick the destination channel. If you want to post to multiple channels, install and authorize the Slack ship multiple times.
+- Authorize Hubspot to access your account, pick the destination channel. If you want to post to multiple channels, install and authorize the Hubspot ship multiple times.
 
 - Go to the Settings tab, choose the segments Users need to belong to to be posted.
 
