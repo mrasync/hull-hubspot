@@ -43,15 +43,30 @@ Might need to merge newer changes in each of those.
 # USER STORIES
 __TO BE WRITTEN__
 
+---
+
 # WHAT CAN BE DONE NOW
 
-## A button to "Fetch all" customers from Hubspot
+### A button to "Fetch all" customers from Hubspot
 Will fetch all customers from Hubspot, using Batching if needed, and store their properties in Hull customers, upserting those that already exist (found by email)
 
-## A regularly scheduled sync (as frequent as possible)
+### A regularly scheduled sync (as frequent as possible)
 To fetch all new and updated customers in Hubspot and store them as Hull users and update those already in there.
 
+---
+
 # Later (Strategy to be determined)
+
+
+- [x] ~~ Hubspot (default properties) -> Hull~~
+- [ ] Hubspot (custom properties) -> Hull
+- [ ] Hull -> Hubspot (default properties)
+- [ ] Hull -> Hubspot (custom properties) (edited)
+- [ ] Hubspot -> Hull (events)
+- [ ] Hull -> Hubspot (selected events)
+
+
+
 - Saving the `hull_segments` property to Hubspot to display Hull segments that the customer belongs to in Hubspot
 - Support for Sending default Hull properties as Hubspot properties
 - Support for updating default Hubspot properties in the Hubspot group in hull and synching back to hubspot
