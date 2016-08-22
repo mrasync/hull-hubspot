@@ -28,7 +28,8 @@ function batchAction(req, res) {
  */
 function handleBatchExtractJob(body, chunkSize) {
     return handleExtract(req.body, chunkSize, (usersBatch) => {
-        return this.queue("exportUsersJob", usersBatch);
+        const filteredUsers = usersBatch.filter((user) => this.shouldSyncUser(user));
+        return this.queue("exportUsersJob", filteredUsers);
     });
 }
 
