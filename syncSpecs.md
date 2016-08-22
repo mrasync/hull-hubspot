@@ -4,9 +4,15 @@ To fetch all new and updated customers in Hubspot and store them as Hull users a
 
 ```javascript
 
+// deps:
+// this.hull
+// this.hubspot
+// this.mapping
+// this.queue
+
 function syncAction() {
-    return getLastUpdate()
-        .then(getRecentContacts);
+    return this.getLastUpdate()
+        .then(this.getRecentContacts);
 }
 
 /**
@@ -14,7 +20,7 @@ function syncAction() {
  * @return {Promise -> lastImportTime (ISO 8601)} 2016-08-04T12:51:46Z
  */
 function getLastUpdate() {
-    hull.get("/search/user_reports", {
+    this.hull.get("/search/user_reports", {
         include: ["hubspot/last_import_time"],
         sort: {
             hubspot/last_import_time: "desc"
@@ -28,15 +34,16 @@ function getLastUpdate() {
  * Get most recent contacts and filters out these who last modification
  * time if older that the lastImportTime. If there are any contacts modified since
  * that time queues import of them and getting next chunk from hubspot API.
+ * @see http://developers.hubspot.com/docs/methods/contacts/get_recently_updated_contacts
  * @param  {Date} lastImportTime
  * @param  {Number} [count=100]
  * @param  {Number} [offset=0]
  * @return {Promise}
  */
 function getRecentContacts(lastImportTime, count = 100, offset = 0) {
-    const properties = mapping.getProperties();
+    const properties = this.mapping.getProperties();
 
-    hubspot.get("/contacts/v1/lists/recently_updated/contacts/recent", {
+    this.hubspot.get("/contacts/v1/lists/recently_updated/contacts/recent", {
         count,
         vidOffset: offset,
         property: properties
@@ -46,8 +53,8 @@ function getRecentContacts(lastImportTime, count = 100, offset = 0) {
         });
 
         if (recentlyModified.length > 0) {
-            queue("getRecentContacts", lastImportTime, count, res["vid-offset"]);
-            queue("importContacts", recentlyModified);
+            this.queue("getRecentContacts", lastImportTime, count, res["vid-offset"]);
+            this.queue("importContacts", recentlyModified);
         }
     });
 }

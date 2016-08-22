@@ -4,19 +4,32 @@ Will fetch all customers from Hubspot, using Batching if needed, and store their
 
 ```javascript
 
+// deps:
+// this.hull
+// this.hubspot
+// this.mapping
+// this.queue
+
 function fetchAllAction() {
-    return getContacts();
+    return this.getContacts();
 }
+
 /**
  * Get 100 hubspot contacts and queues their import
  * and getting another 100 - needs to be processed in one queue without
  * any concurrency
+ * @see http://developers.hubspot.com/docs/methods/contacts/get_contacts
  * @param  {Number} [count=100]
  * @param  {Number} [offset=0]
  * @return {Promise}
  */
 function getContacts(count = 100, offset = 0) {
-    const properties = mapping.getProperties();
+
+    if (count > 100) {
+        return this.hull.logger.error("getContact gets maximum of 100 contacts at once", count);
+    }
+
+    const properties = this.mapping.getProperties();
 
     hubspot.get("/contacts/v1/lists/all/contacts/all", {
         count,
@@ -24,18 +37,20 @@ function getContacts(count = 100, offset = 0) {
         property: properties
     }, (res) => {
         if (res["has-more"]) {
-            queue("getContacts", res["vid-offset"]);
+            this.queue("getContacts", count, res["vid-offset"]);
         }
 
-        if (res.contacts > 0) {
-            queue("importContacts", res.contacts);
+        if (res.body.contacts > 0) {
+            this.queue("importContacts", res.contacts);
         }
     });
 }
 
 /**
  * creates or updates users
- * @param  {Array} contacts
+ * @see https://www.hull.io/docs/references/api/#endpoint-identities-create-a-user-with-email-and-password
+ * @see https://www.hull.io/docs/references/api/#endpoint-traits
+ * @param  {Array} Hubspot contacts
  * @return {Promise}
  */
 function importContacts(contacts) {
@@ -44,15 +59,15 @@ function importContacts(contacts) {
         (function() {
             if (!c.properties.hull_id) {
                 // create hull user
-                return Hull.api('/users', 'post', {
+                return this.hull.api('/users', 'post', {
                   "email": email,
                   "password": "s3cr3t"
                 });
             }
             return Promise.resolve(c);
-        }).then(c => {
-            const traits = mapping.getTraits(c);
-            return hull.as({ email }).traits(traits, { source: "hubspot "});
+        })().then(c => {
+            const traits = this.mapping.getTraits(c);
+            return this.hull.as({ email }).traits(traits, { source: "hubspot "});
         })
 
     });
@@ -70,6 +85,7 @@ function getTraits(userData) {
     return {
         trait_name: userData.properties.property_name.value,
         trait2_name: userData.properties.property2_name.value,
+        vid: userData.properties.vid.value,
         last_import_time: new Date()
     };
 }
