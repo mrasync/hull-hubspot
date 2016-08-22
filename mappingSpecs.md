@@ -35,7 +35,7 @@ function getHullTraits(userData) {
         trait_name: userData.properties.property_name.value,
         trait2_name: userData.properties.property2_name.value,
         id: userData.properties.vid.value,
-        fetched_at: new Date()
+        fetched_at: userData.properties.lastmodifieddate
     };
 }
 
