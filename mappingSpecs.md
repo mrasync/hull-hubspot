@@ -16,6 +16,16 @@ function getHubspotPropertiesKeys() {
 }
 
 /**
+ * Returns the Hull traits names.
+ * Useful when doing request extract calls
+ * @return {Array}
+ */
+function getHullTraitsKeys() {
+    return ["trait_name", "trait2_name"];
+}
+
+
+/**
  * Maps Hubspot contact properties to Hull traits
  * @param  {Object} userData Hubspot contact
  * @return {Object}          Hull user traits

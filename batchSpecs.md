@@ -24,7 +24,7 @@ function batchAction(req, res) {
  * Parses the extract results and queues chunks for export operations
  * @param  {String} body
  * @param  {Number} chunkSize
- * @return {Promise}           [description]
+ * @return {Promise}
  */
 function handleBatchExtractJob(body, chunkSize) {
     return handleExtract(req.body, chunkSize, (usersBatch) => {
