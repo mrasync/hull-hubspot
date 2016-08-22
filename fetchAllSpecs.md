@@ -48,7 +48,6 @@ function getContacts(count = 100, offset = 0) {
 
 /**
  * creates or updates users
- * @see https://www.hull.io/docs/references/api/#endpoint-identities-create-a-user-with-email-and-password
  * @see https://www.hull.io/docs/references/api/#endpoint-traits
  * @param  {Array} Hubspot contacts
  * @return {Promise}
@@ -56,20 +55,8 @@ function getContacts(count = 100, offset = 0) {
 function importContacts(contacts) {
     return contact.map((c) => {
         const email = _.find(c.identities, { type: "EMAIL" }).value;
-        (function() {
-            if (!c.properties.hull_id) {
-                // create hull user
-                return this.hull.api('/users', 'post', {
-                  "email": email,
-                  "password": "s3cr3t"
-                });
-            }
-            return Promise.resolve(c);
-        })().then(c => {
-            const traits = this.mapping.getTraits(c);
-            return this.hull.as({ email }).traits(traits, { source: "hubspot "});
-        })
-
+        const traits = this.mapping.getTraits(c);
+        return this.hull.as({ email }).traits(traits, { source: "hubspot "});
     });
 }
 
@@ -85,8 +72,8 @@ function getTraits(userData) {
     return {
         trait_name: userData.properties.property_name.value,
         trait2_name: userData.properties.property2_name.value,
-        vid: userData.properties.vid.value,
-        last_import_time: new Date()
+        id: userData.properties.vid.value,
+        fetched_at: new Date()
     };
 }
 ```

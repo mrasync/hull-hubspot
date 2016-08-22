@@ -21,13 +21,13 @@ function syncAction() {
  */
 function getLastUpdate() {
     this.hull.get("/search/user_reports", {
-        include: ["hubspot/last_import_time"],
+        include: ["hubspot/fetched_at"],
         sort: {
-            hubspot/last_import_time: "desc"
+            hubspot/fetched_at: "desc"
         },
         per_page: 1
     })
-    .then((r) => r.data[0]['traits_hubspot/last_import_time']);
+    .then((r) => r.data[0]['traits_hubspot/fetched_at']);
 }
 
 /**
