@@ -20,9 +20,9 @@ function syncAction(req, res) {
 
 function syncJob(lastImportTime, count = 100, offset = 0) {
     return this.getRecentContacts(lastImportTime, count, offset)
-        .then((recentlyModified) => {
+        .then(({ recentlyModified, offset }) => {
             if (recentlyModified.length > 0) {
-                this.queue("syncJob", lastImportTime, count, res["vid-offset"]);
+                this.queue("syncJob", lastImportTime, count, offset);
                 this.queue("importContacts", recentlyModified);
             }
         });
@@ -62,7 +62,10 @@ function getRecentContacts(lastImportTime, count = 100, offset = 0) {
         property: properties
     }, (res) => {
         return res.contacts.filter((c) => {
-            return moment(c.properties.lastmodifieddate).isAfter(lastImportTime);
+            const recentlyModified = moment(c.properties.lastmodifieddate)
+                .isAfter(lastImportTime);
+
+            return { recentlyModified, offset: res["vid-offset"] };
         });
     });
 }
