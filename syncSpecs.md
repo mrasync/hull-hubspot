@@ -12,7 +12,13 @@ To fetch all new and updated customers in Hubspot and store them as Hull users a
 
 function syncAction() {
     return this.getLastUpdate()
-        .then(this.getRecentContacts);
+        .then(this.getRecentContacts)
+        .then((recentlyModified) => {
+            if (recentlyModified.length > 0) {
+                this.queue("getRecentContacts", lastImportTime, count, res["vid-offset"]);
+                this.queue("importContacts", recentlyModified);
+            }
+        });
 }
 
 /**
@@ -38,7 +44,7 @@ function getLastUpdate() {
  * @param  {Date} lastImportTime
  * @param  {Number} [count=100]
  * @param  {Number} [offset=0]
- * @return {Promise}
+ * @return {Promise -> Array}
  */
 function getRecentContacts(lastImportTime, count = 100, offset = 0) {
     const properties = this.mapping.getHubspotPropertiesKeys();
@@ -48,14 +54,9 @@ function getRecentContacts(lastImportTime, count = 100, offset = 0) {
         vidOffset: offset,
         property: properties
     }, (res) => {
-        const recentlyModified = res.contacts.filter((c) => {
+        return res.contacts.filter((c) => {
             return moment(c.properties.lastmodifieddate).isAfter(lastImportTime);
         });
-
-        if (recentlyModified.length > 0) {
-            this.queue("getRecentContacts", lastImportTime, count, res["vid-offset"]);
-            this.queue("importContacts", recentlyModified);
-        }
     });
 }
 ```

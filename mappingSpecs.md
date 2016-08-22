@@ -30,7 +30,7 @@ function getHullTraits(userData) {
 }
 
 /**
- * Map Hull user data to Hubspot contact properties
+ * Maps Hull user data to Hubspot contact properties
  * @see http://developers.hubspot.com/docs/methods/contacts/update_contact
  * @param  {Object} userData Hull user object
  * @return {Array}           Hubspot properties array

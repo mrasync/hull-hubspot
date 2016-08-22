@@ -11,12 +11,12 @@ The bath will handle the batch operation syncing users from Hull to Hubspot
 
 function batchAction(req) {
     return handleExtract(req.body, 100, (usersBatch) => {
-        this.queue("exportUsers", usersBatch);
+        return this.queue("exportUsers", usersBatch);
     });
 }
 
 /**
- * Creates or updates
+ * Exports Hull users to Hubspot contacts using create or update strategy
  * @see http://developers.hubspot.com/docs/methods/contacts/batch_create_or_update
  * @param  {Array} users users from Hull
  * @return {Promise}
