@@ -9,9 +9,26 @@ The bath will handle the batch operation syncing users from Hull to Hubspot
 // this.mapping
 // this.queue
 
-function batchAction(req) {
-    return handleExtract(req.body, 100, (usersBatch) => {
-        return this.queue("exportUsers", usersBatch);
+/**
+ * public method which queues the handleBatchExtractJob
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Promise}
+ */
+function batchAction(req, res) {
+    return this.queue("handleBatchExtractJob", req.body, 100)
+        .then(() => res.end("ok"));
+}
+
+/**
+ * Parses the extract results and queues chunks for export operations
+ * @param  {String} body
+ * @param  {Number} chunkSize
+ * @return {Promise}           [description]
+ */
+function handleBatchExtractJob(body, chunkSize) {
+    return handleExtract(req.body, chunkSize, (usersBatch) => {
+        return this.queue("exportUsersJob", usersBatch);
     });
 }
 
@@ -21,7 +38,7 @@ function batchAction(req) {
  * @param  {Array} users users from Hull
  * @return {Promise}
  */
-function exportUsers(users) {
+function exportUsersJob(users) {
 
     if (users.count > 100) {
         this.hull.logger.warning("exportUsers works best for under 100 users at once", users.count);

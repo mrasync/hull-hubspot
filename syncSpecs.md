@@ -10,12 +10,19 @@ To fetch all new and updated customers in Hubspot and store them as Hull users a
 // this.mapping
 // this.queue
 
-function syncAction() {
+function syncAction(req, res) {
     return this.getLastUpdate()
-        .then(this.getRecentContacts)
+        .then((lastImportTime) => {
+            return this.queue("syncJob", lastImportTime);
+        })
+        .then(() => res.end("ok"));
+}
+
+function syncJob(lastImportTime, count = 100, offset = 0) {
+    return this.getRecentContacts(lastImportTime, count, offset)
         .then((recentlyModified) => {
             if (recentlyModified.length > 0) {
-                this.queue("getRecentContacts", lastImportTime, count, res["vid-offset"]);
+                this.queue("syncJob", lastImportTime, count, res["vid-offset"]);
                 this.queue("importContacts", recentlyModified);
             }
         });

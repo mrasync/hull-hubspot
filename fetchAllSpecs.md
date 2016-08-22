@@ -10,16 +10,31 @@ Will fetch all customers from Hubspot, using Batching if needed, and store their
 // this.mapping -> mappingSpecs.md
 // this.queue
 
-function fetchAllAction() {
+/**
+ * public facing method
+ * @return {Promise}
+ */
+function fetchAllAction(req, res) {
     const count = 100;
-    return this.getContacts(count)
+    return this.queue("fetchAllJob", count)
+        .then(() => res.end("ok"));
+}
+
+/**
+ * Job which performs fetchAll operations queues itself and the import job
+ * @param  {Number} count
+ * @param  {Number} [offset=0]
+ * @return {Promise}
+ */
+function fetchAllJob(count, offset = 0) {
+    return this.getContacts(count, offset)
         .then((res) => {
             if (res.body["has-more"]) {
-                this.queue("getContacts", count, res.body["vid-offset"]);
+                this.queue("fetchAllJob", count, res.body["vid-offset"]);
             }
 
             if (res.body.contacts > 0) {
-                this.queue("importContacts", res.body.contacts);
+                this.queue("importContactsJob", res.body.contacts);
             }
         });
 }
@@ -54,7 +69,7 @@ function getContacts(count = 100, offset = 0) {
  * @param  {Array} Hubspot contacts
  * @return {Promise}
  */
-function importContacts(contacts) {
+function importContactsJob(contacts) {
     return contact.map((c) => {
         const email = _.find(c.identities, { type: "EMAIL" }).value;
         const traits = this.mapping.getHullTraits(c);

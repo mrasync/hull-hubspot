@@ -7,6 +7,6 @@ When Hull user is updated Hubspot contact properties should be synced.
 // this.queue
 
 function handleUserUpdate({ user, changes = {}, segments = [] }) {
-    this.queue("exportUsers", [ user ]);
+    this.queue("exportUsersJob", [ user ]);
 }
 ```
