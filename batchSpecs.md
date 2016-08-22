@@ -28,7 +28,7 @@ function exportUsers(users) {
     }
 
     const body = users.map((user) => {
-        const properties = this.mapping.getExportProperties(user);
+        const properties = this.mapping.getHubspotProperties(user);
         return {
             email: user.email,
             properties
@@ -38,21 +38,4 @@ function exportUsers(users) {
     return this.hubspot.post(`/contacts/v1/contact/batch/`, body);
 }
 
-
-/**
- * Hubspot properies names
- * @return {Array}
- */
-function getExportProperties(userData) {
-    return [{
-        "property": "hull_id",
-        "value": userData.id
-    }, {
-        "property": "email",
-        "value": userData.email
-    }, {
-        "property": "firstname",
-        "value": userData.firstname
-    }];
-}
 ```

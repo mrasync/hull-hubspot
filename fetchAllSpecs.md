@@ -7,11 +7,21 @@ Will fetch all customers from Hubspot, using Batching if needed, and store their
 // deps:
 // this.hull
 // this.hubspot
-// this.mapping
+// this.mapping -> mappingSpecs.md
 // this.queue
 
 function fetchAllAction() {
-    return this.getContacts();
+    const count = 100;
+    return this.getContacts(count)
+        .then((res) => {
+            if (res.body["has-more"]) {
+                this.queue("getContacts", count, res.body["vid-offset"]);
+            }
+
+            if (res.body.contacts > 0) {
+                this.queue("importContacts", res.body.contacts);
+            }
+        });
 }
 
 /**
@@ -29,20 +39,12 @@ function getContacts(count = 100, offset = 0) {
         return this.hull.logger.error("getContact gets maximum of 100 contacts at once", count);
     }
 
-    const properties = this.mapping.getProperties();
+    const properties = this.mapping.getHubspotPropertiesKeys();
 
-    hubspot.get("/contacts/v1/lists/all/contacts/all", {
+    return this.hubspot.get("/contacts/v1/lists/all/contacts/all", {
         count,
         vidOffset: offset,
         property: properties
-    }, (res) => {
-        if (res["has-more"]) {
-            this.queue("getContacts", count, res["vid-offset"]);
-        }
-
-        if (res.body.contacts > 0) {
-            this.queue("importContacts", res.contacts);
-        }
     });
 }
 
@@ -55,25 +57,9 @@ function getContacts(count = 100, offset = 0) {
 function importContacts(contacts) {
     return contact.map((c) => {
         const email = _.find(c.identities, { type: "EMAIL" }).value;
-        const traits = this.mapping.getTraits(c);
+        const traits = this.mapping.getHullTraits(c);
         return this.hull.as({ email }).traits(traits, { source: "hubspot "});
     });
 }
 
-/**
- * Hubspot properies names
- * @return {Array}
- */
-function getProperties() {
-    return ["property_name", "property2_name"];
-}
-
-function getTraits(userData) {
-    return {
-        trait_name: userData.properties.property_name.value,
-        trait2_name: userData.properties.property2_name.value,
-        id: userData.properties.vid.value,
-        fetched_at: new Date()
-    };
-}
 ```

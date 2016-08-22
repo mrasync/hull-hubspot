@@ -41,7 +41,7 @@ function getLastUpdate() {
  * @return {Promise}
  */
 function getRecentContacts(lastImportTime, count = 100, offset = 0) {
-    const properties = this.mapping.getProperties();
+    const properties = this.mapping.getHubspotPropertiesKeys();
 
     this.hubspot.get("/contacts/v1/lists/recently_updated/contacts/recent", {
         count,
