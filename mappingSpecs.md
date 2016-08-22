@@ -6,13 +6,21 @@ Mapping should map data both ways between Hull and Hubspot data structures
 // deps:
 // it should have a dependency on hull ship settings
 
+const map = [
+    { name: "email", hull: "email", type: "string",  title: "Email" },
+    { name: "salutation", hull: "hubspot/salutation", type: "string",  title: "Salutation" },
+    { name: "firstname", hull: "hubspot/first_name", type: "string",  title: "First Name" },
+    { name: "lastname", hull: "hubspot/last_name", type: "string",  title: "Last Name" },
+    { name: "phone", hull: "hubspot/phone", type: "string",  title: "Phone Number" },
+];
+
 /**
  * Returns the Hubspot properties names.
  * When doing a sync we need to download only those
  * @return {Array}
  */
 function getHubspotPropertiesKeys() {
-    return ["property_name", "property2_name"];
+    return this.map.map((prop) => prop.name);
 }
 
 /**
@@ -21,7 +29,7 @@ function getHubspotPropertiesKeys() {
  * @return {Array}
  */
 function getHullTraitsKeys() {
-    return ["trait_name", "trait2_name"];
+    return this.map.map((prop) => prop.hull);
 }
 
 
@@ -31,12 +39,9 @@ function getHullTraitsKeys() {
  * @return {Object}          Hull user traits
  */
 function getHullTraits(userData) {
-    return {
-        trait_name: userData.properties.property_name.value,
-        trait2_name: userData.properties.property2_name.value,
-        id: userData.properties.vid.value,
-        fetched_at: userData.properties.lastmodifieddate
-    };
+    return this.map.reduce((traits, prop) => {
+        return traits[prop.hull] = _.get(userData, `properties[${prop.name}].value`);
+    }, {});
 }
 
 /**
@@ -46,12 +51,11 @@ function getHullTraits(userData) {
  * @return {Array}           Hubspot properties array
  */
 function getHubspotProperties(userData) {
-    return [{
-        "property": "email",
-        "value": userData.email
-    }, {
-        "property": "firstname",
-        "value": userData.firstname
-    }];
+    return this.map.map((prop) => {
+        return {
+            property: prop.name,
+            value: _.get(userData, prop.hull)
+        }
+    });
 }
 ```

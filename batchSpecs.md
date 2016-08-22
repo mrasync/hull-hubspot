@@ -34,7 +34,11 @@ function handleBatchExtractJob(body, chunkSize) {
 }
 
 /**
- * Exports Hull users to Hubspot contacts using create or update strategy
+ * Exports Hull users to Hubspot contacts using create or update strategy.
+ * The job on Hubspot side is done async the returned Promise is resolved
+ * when the query was queued successfully. It is rejected when:
+ * "you pass an invalid email address, if a property in your request doesn't exist,
+ * or if you pass an invalid property value."
  * @see http://developers.hubspot.com/docs/methods/contacts/batch_create_or_update
  * @param  {Array} users users from Hull
  * @return {Promise}
