@@ -29,9 +29,14 @@ export default class HubspotClient {
     return this.attach(req);
   }
 
+  put(url) {
+    const req = this.req.put(url);
+    return this.attach(req);
+  }
+
   refreshAccessToken() {
-    return this.req
-      .post("/auth/v1/refresh")
+    return this.attach(this.req
+      .post("/auth/v1/refresh"))
       .set("Content-Type", "application/x-www-form-urlencoded")
       .send({
         refresh_token: this.refreshToken,

@@ -13,8 +13,13 @@ export default class HullAgent {
     this.mapping = mapping;
   }
 
+  getSegments() {
+    return this.hullClient.get("segments", { limit: 500 });
+  }
+
   updateShipSettings(newSettings) {
     return this.hullClient.put(this.ship.id, {
+      ...this.ship.private_settings,
       private_settings: newSettings
     });
   }

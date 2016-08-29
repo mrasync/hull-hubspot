@@ -35,6 +35,8 @@ export default class WebRoutes {
       hostSecret: process.env.SECRET || "1234",
       groupTraits: false,
       handlers: {
+        "segment:update": notifyController.segmentUpdateHandler.bind(notifyController),
+        "segment:delete": notifyController.segmentDeleteHandler.bind(notifyController),
         "user:update": notifyController.userUpdateHandler.bind(notifyController),
         "ship:update": notifyController.shipUpdateHandler.bind(notifyController),
       }
@@ -59,15 +61,21 @@ export default class WebRoutes {
       },
       onLogin: (req, { hull, ship }) => {
         req.authParams = { ...req.body, ...req.query };
-        return save(hull, ship, {
-          portalId: req.authParams.portalId
+        return hull.put(ship.id, {
+          private_settings: {
+            ...ship.private_settings,
+            portalId: req.authParams.portalId
+          }
         });
       },
       onAuthorize: (req, { hull, ship }) => {
         const { refreshToken, accessToken } = (req.account || {});
-        return save(hull, ship, {
-          refresh_token: refreshToken,
-          token: accessToken
+        return hull.put(ship.id, {
+          private_settings: {
+            ...ship.private_settings,
+            refresh_token: refreshToken,
+            token: accessToken
+          }
         });
       },
       views: {

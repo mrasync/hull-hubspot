@@ -1,5 +1,6 @@
 import moment from "moment";
 import Promise from "bluebird";
+import ContactProperty from "./contact-property";
 
 export default class HubspotAgent {
 
@@ -8,6 +9,7 @@ export default class HubspotAgent {
     this.hullClient = hullClient;
     this.mapping = mapping;
     this.hubspotClient = hubspotClient;
+    this.contactProperty = new ContactProperty;
   }
 
   checkToken() {
@@ -21,6 +23,7 @@ export default class HubspotAgent {
         if (err.response.statusCode === 401) {
           return this.hubspotClient.refreshAccessToken()
             .then((res) => {
+              console.log("REQ", res);
               return this.hullAgent.updateShipSettings({
                 token: res.body.access_token
               });
@@ -84,5 +87,34 @@ export default class HubspotAgent {
         });
         return res;
       });
+  }
+
+  syncHullGroup() {
+    return Promise.all([
+      this.hullAgent.getSegments(),
+      this.hubspotClient.get("/contacts/v2/groups").query({ includeProperties: true })
+    ]).then(([segments = [], res]) => {
+      const hubspotGroups = res.body;
+      const hullSegmentsProperty = this.contactProperty.getHullProperty(segments);
+      const hullGroup = this.contactProperty.findHullGroup(hubspotGroups);
+
+      return (() => {
+        if (!hullGroup) {
+          return this.hubspotClient.post("/contacts/v2/groups")
+            .send(this.contactProperty.getHullGroup());
+        }
+        return Promise.resolve();
+      })()
+      .then(() => {
+        if (this.contactProperty.findHullProperty(hullGroup)) {
+          return this.hubspotClient
+            .put(`/contacts/v2/properties/named/${hullSegmentsProperty.name}`)
+            .send(hullSegmentsProperty);
+        }
+        return this.hubspotClient.post("/contacts/v2/properties")
+          .send(hullSegmentsProperty);
+      });
+
+    });
   }
 }

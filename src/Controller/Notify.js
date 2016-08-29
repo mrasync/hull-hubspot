@@ -12,5 +12,16 @@ export default class UserUpdateStrategy {
 
   shipUpdateHandler(payload, { req }) {
     const message = payload.message;
+    return req.app.hubspotAgent.syncHullGroup();
+  }
+
+  segmentUpdateHandler(payload, { req }) {
+    const message = payload.message;
+    return req.app.hubspotAgent.syncHullGroup();
+  }
+
+  segmentDeleteHandler(payload, { req }) {
+    const message = payload.message;
+    return req.app.hubspotAgent.syncHullGroup();
   }
 }
