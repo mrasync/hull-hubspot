@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { renderFile } from "ejs";
-import AppMiddleware from "../Lib/Middleware/App";
+import AppMiddleware from "../lib/middleware/app";
 import Hull from "hull";
 
 export default function ({ queueAdapter }) {
