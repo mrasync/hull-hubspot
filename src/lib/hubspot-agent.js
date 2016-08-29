@@ -9,7 +9,7 @@ export default class HubspotAgent {
     this.hullClient = hullClient;
     this.mapping = mapping;
     this.hubspotClient = hubspotClient;
-    this.contactProperty = new ContactProperty;
+    this.contactProperty = new ContactProperty();
   }
 
   checkToken() {
@@ -114,7 +114,6 @@ export default class HubspotAgent {
         return this.hubspotClient.post("/contacts/v2/properties")
           .send(hullSegmentsProperty);
       });
-
     });
   }
 }

@@ -30,7 +30,7 @@ const controllers = {
   syncController: new SyncController(),
 };
 
-const webApp = WebApp({ queueAdapter })
+WebApp({ queueAdapter })
   .use("/", WebAppRouter({ ...controllers, Hull }))
   .use("/", WebStaticRouter({ Hull }))
   .use("/", WebOauthRouter({ Hull }))
@@ -39,6 +39,6 @@ const webApp = WebApp({ queueAdapter })
   });
 
 
-const queueApp = new QueueApp(queueAdapter)
+new QueueApp(queueAdapter)
   .use(QueueRouter(controllers))
   .process();

@@ -1,5 +1,3 @@
-import { NotifHandler } from "hull";
-
 export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
     const message = payload.message;

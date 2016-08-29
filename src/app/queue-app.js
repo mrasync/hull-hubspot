@@ -1,8 +1,8 @@
 import Supply from "supply";
 import Promise from "bluebird";
+import Hull from "hull";
 
 import AppMiddleware from "../lib/middleware/app";
-import Hull from "hull";
 
 export default class QueueApp {
   constructor(queueAdapter) {

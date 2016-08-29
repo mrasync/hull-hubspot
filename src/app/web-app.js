@@ -1,8 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { renderFile } from "ejs";
-import AppMiddleware from "../lib/middleware/app";
 import Hull from "hull";
+
+import AppMiddleware from "../lib/middleware/app";
 
 export default function ({ queueAdapter }) {
   const app = express();
