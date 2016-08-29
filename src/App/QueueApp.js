@@ -17,7 +17,6 @@ export default class QueueApp {
     this.handlers = {};
 
     this.supply = new Supply();
-
   }
 
   process(jobName, worker) {

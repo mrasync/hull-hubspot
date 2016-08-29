@@ -27,5 +27,5 @@ export default function (req, res, next) {
   //     organization: config.organization,
   //     secret: config.secret
   // }, shipToken);
-  next();
+  return next();
 }

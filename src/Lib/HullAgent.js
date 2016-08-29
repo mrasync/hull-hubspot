@@ -53,10 +53,9 @@ export default class HullAgent {
       page: 1
     })
     .then((r) => {
-      console.log("B");
-      return r.data[0]["traits_hubspot/fetched_at"]
+      return r.data[0]["traits_hubspot/fetched_at"];
     })
-    .catch((err) => {
+    .catch(() => {
       return Promise.resolve(new Date(0));
     });
   }

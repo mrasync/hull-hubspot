@@ -22,6 +22,6 @@ export default function (queueAdapter) {
 
     req.app.queueAgent = new QueueAgent(queueAdapter, req);
 
-    next();
+    return next();
   };
 }

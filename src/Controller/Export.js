@@ -35,10 +35,10 @@ export default class ExportController {
       .set("Content-Type", "application/json")
       .send(body)
       .then(res => {
-        if (res.statusCode == 202) {
+        if (res.statusCode === 202) {
           return Promise.resolve();
         }
-        Promise.reject(new Error("Error in create/update batch"));
+        return Promise.reject(new Error("Error in create/update batch"));
       });
   }
 }

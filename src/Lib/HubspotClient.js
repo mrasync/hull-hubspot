@@ -6,7 +6,7 @@ export default class HubspotClient {
   constructor(accessToken, refreshToken) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.req = request
+    this.req = request;
   }
 
   attach(req) {
@@ -14,18 +14,18 @@ export default class HubspotClient {
       .use(prefixPlugin("https://api.hubapi.com"))
       .use(superagentPromisePlugin)
       .query({ access_token: this.accessToken })
-      .on("request", (req) => {
-        console.log("REQ", req.url);
+      .on("request", (reqData) => {
+        console.log("REQ", reqData.url);
       });
   }
 
   get(url) {
-    const req =  this.req.get(url);
+    const req = this.req.get(url);
     return this.attach(req);
   }
 
   post(url) {
-    const req =  this.req.post(url);
+    const req = this.req.post(url);
     return this.attach(req);
   }
 

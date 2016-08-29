@@ -37,13 +37,13 @@ webApp.post("/batch", batchController.handleBatchExtractAction.bind(batchControl
 webApp.post("/fetchAll", fetchAllController.fetchAllAction.bind(fetchAllController));
 webApp.post("/sync", syncController.syncAction.bind(syncController));
 webApp.get("/notify", NotifHandler({
-    hostSecret: "test",
-    groupTraits: false,
-    handlers: {
-      "user:update": notifyController.handleUserUpdate.bind(notifyController),
-      // "ship:update": MailchimpAgent.handle("handleShipUpdate", MailchimpClient),
-    }
-  }));
+  hostSecret: "test",
+  groupTraits: false,
+  handlers: {
+    "user:update": notifyController.handleUserUpdate.bind(notifyController),
+    // "ship:update": MailchimpAgent.handle("handleShipUpdate", MailchimpClient),
+  }
+}));
 
 webApp.get("/monitor/checkToken", monitorController.checkTokenAction.bind(MonitorController));
 

@@ -5,11 +5,11 @@ export default class Mapping {
     this.ship = ship;
 
     this.map = [
-        { name: "email", hull: "email", type: "string",  title: "Email" },
-        { name: "salutation", hull: "hubspot/salutation", type: "string",  title: "Salutation" },
-        { name: "firstname", hull: "hubspot/first_name", type: "string",  title: "First Name" },
-        { name: "lastname", hull: "hubspot/last_name", type: "string",  title: "Last Name" },
-        { name: "phone", hull: "hubspot/phone", type: "string",  title: "Phone Number" }
+        { name: "email", hull: "email", type: "string", title: "Email" },
+        { name: "salutation", hull: "hubspot/salutation", type: "string", title: "Salutation" },
+        { name: "firstname", hull: "hubspot/first_name", type: "string", title: "First Name" },
+        { name: "lastname", hull: "hubspot/last_name", type: "string", title: "Last Name" },
+        { name: "phone", hull: "hubspot/phone", type: "string", title: "Phone Number" }
     ];
   }
 
@@ -19,7 +19,7 @@ export default class Mapping {
    * @return {Array}
    */
   getHubspotPropertiesKeys() {
-      return this.map.map((prop) => prop.name);
+    return this.map.map((prop) => prop.name);
   }
 
   /**
@@ -28,7 +28,7 @@ export default class Mapping {
    * @return {Array}
    */
   getHullTraitsKeys() {
-      return this.map.map((prop) => prop.hull);
+    return this.map.map((prop) => prop.hull);
   }
 
 
@@ -38,14 +38,14 @@ export default class Mapping {
    * @return {Object}          Hull user traits
    */
   getHullTraits(userData) {
-      const hullTraits = _.reduce(this.map, (traits, prop) => {
-          traits[prop.hull] = _.get(userData, `properties[${prop.name}].value`);
-          return traits;
-      }, {});
+    const hullTraits = _.reduce(this.map, (traits, prop) => {
+      traits[prop.hull] = _.get(userData, `properties[${prop.name}].value`);
+      return traits;
+    }, {});
 
-      hullTraits["fetched_at"] = new Date();
+    hullTraits.fetched_at = new Date();
 
-      return hullTraits;
+    return hullTraits;
   }
 
   /**
@@ -55,15 +55,15 @@ export default class Mapping {
    * @return {Array}           Hubspot properties array
    */
   getHubspotProperties(userData) {
-      return _.reduce(this.map, (props, prop) => {
-        const value = _.get(userData, prop.hull);
-        if (value) {
-          props.push({
-            property: prop.name,
-            value
-          });
-        }
-        return props;
-      }, []);
+    return _.reduce(this.map, (props, prop) => {
+      const value = _.get(userData, prop.hull);
+      if (value) {
+        props.push({
+          property: prop.name,
+          value
+        });
+      }
+      return props;
+    }, []);
   }
 }

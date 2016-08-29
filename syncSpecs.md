@@ -56,11 +56,14 @@ function getLastUpdate() {
 function getRecentContacts(lastImportTime, count = 100, offset = 0) {
     const properties = this.mapping.getHubspotPropertiesKeys();
 
-    this.hubspot.get("/contacts/v1/lists/recently_updated/contacts/recent", {
+    return this.hubspot.request()
+    .get("/contacts/v1/lists/recently_updated/contacts/recent")
+    .query({
         count,
         vidOffset: offset,
         property: properties
-    }, (res) => {
+    })
+    .then((res) => {
         return res.contacts.filter((c) => {
             const recentlyModified = moment(c.properties.lastmodifieddate)
                 .isAfter(lastImportTime);

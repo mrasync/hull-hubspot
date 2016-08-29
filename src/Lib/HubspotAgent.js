@@ -15,10 +15,10 @@ export default class HubspotAgent {
       .get("/contacts/v1/lists/recently_updated/contacts/recent")
       .query({ count: 1 })
       .then(() => {
-        return "valid"
+        return "valid";
       })
       .catch((err) => {
-        if (err.response.statusCode) {
+        if (err.response.statusCode === 401) {
           return this.hubspotClient.refreshAccessToken()
             .then((res) => {
               return this.hullAgent.updateShipSettings({
@@ -29,6 +29,7 @@ export default class HubspotAgent {
               return "refreshed";
             });
         }
+        return Promise.reject(err);
       });
   }
 

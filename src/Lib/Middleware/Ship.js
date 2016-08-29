@@ -5,9 +5,9 @@ export default function (req, res, next) {
     return next();
   }
 
-  req.hull.client.get(req.query.ship)
+  return req.hull.client.get(req.query.ship)
     .then((ship) => {
       req.hull.ship = ship;
-      next();
+      return next();
     });
 }
