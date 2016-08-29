@@ -2,8 +2,7 @@ import Supply from "supply";
 import Promise from "bluebird";
 
 import AppMiddleware from "../Lib/Middleware/App";
-import ShipMiddleware from "../Lib/Middleware/Ship";
-import HullClientMiddleware from "../Lib/Middleware/HullClient";
+import Hull from "hull";
 
 export default class QueueApp {
   constructor(queueAdapter) {
@@ -34,13 +33,16 @@ export default class QueueApp {
 
     return Promise.fromCallback((callback) => {
       this.supply
-        .use(HullClientMiddleware)
-        .use(ShipMiddleware)
+        .use(Hull.Middleware({ hostSecret: process.env.SECRET || "1234" }))
         .use(AppMiddleware(this.queueAdapter))
         .each(req, res, callback);
     })
     .then(() => {
       return this.handlers[jobName](req, res);
     });
+  }
+
+  use(router) {
+    return router(this);
   }
 }

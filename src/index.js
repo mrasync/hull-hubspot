@@ -11,48 +11,34 @@ import SyncController from "./Controller/Sync";
 import NotifyController from "./Controller/Notify";
 import WebApp from "./App/WebApp";
 import QueueApp from "./App/QueueApp";
-import WebRoutes from "./App/WebRoutes";
-import QueueRoutes from "./App/QueueRoutes";
+import WebAppRouter from "./router/web-app-router";
+import WebStaticRouter from "./router/web-static-router";
+import WebOauthRouter from "./router/web-oauth-router";
+import QueueRouter from "./router/queue-router";
 
 const queueAdapter = new KueAdapter(kue.createQueue({
   redis: process.env.REDIS_URL
 }));
 
-const batchController = new BatchController();
-const monitorController = new MonitorController();
-const fetchAllController = new FetchAllController();
-const importController = new ImportController();
-const exportController = new ExportController();
-const notifyController = new NotifyController();
-const syncController = new SyncController();
+const controllers = {
+  batchController: new BatchController(),
+  monitorController: new MonitorController(),
+  fetchAllController: new FetchAllController(),
+  importController: new ImportController(),
+  exportController: new ExportController(),
+  notifyController: new NotifyController(),
+  syncController: new SyncController(),
+};
 
-const webApp = new WebApp(queueAdapter);
-const queueApp = new QueueApp(queueAdapter);
-const webRoutes = new WebRoutes({
-  batchController,
-  monitorController,
-  fetchAllController,
-  importController,
-  exportController,
-  notifyController,
-  syncController,
-  Hull
-});
+const webApp = WebApp({ queueAdapter })
+  .use("/", WebAppRouter({ ...controllers, Hull }))
+  .use("/", WebStaticRouter({ Hull }))
+  .use("/", WebOauthRouter({ Hull }))
+  .listen(process.env.PORT || 8082, () => {
+    Hull.logger.info("webApp.listen");
+  });
 
-const queueRoutes = new QueueRoutes({
-  batchController,
-  monitorController,
-  fetchAllController,
-  importController,
-  exportController,
-  notifyController,
-  syncController
-});
 
-webRoutes.setup(webApp);
-queueRoutes.setup(queueApp);
-
-webApp.listen(process.env.PORT || 8082, () => {
-  Hull.logger.info("webApp.listen");
-});
-queueApp.process();
+const queueApp = new QueueApp(queueAdapter)
+  .use(QueueRouter(controllers))
+  .process();

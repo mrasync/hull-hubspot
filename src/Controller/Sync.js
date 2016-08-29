@@ -1,11 +1,13 @@
 export default class SyncStrategy {
 
   syncAction(req, res) {
+    const count = 100;
     return req.app.hullAgent.getLastUpdate()
         .then((lastImportTime) => {
           console.log(lastImportTime);
           return req.app.queueAgent.create("syncJob", {
-            lastImportTime
+            lastImportTime,
+            count
           });
         })
         .then(() => res.end("ok"));

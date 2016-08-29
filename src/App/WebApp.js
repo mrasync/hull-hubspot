@@ -1,25 +1,23 @@
-import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import { renderFile } from "ejs";
-
 import AppMiddleware from "../Lib/Middleware/App";
-import ShipMiddleware from "../Lib/Middleware/Ship";
-import HullClientMiddleware from "../Lib/Middleware/HullClient";
+import Hull from "hull";
 
-export default class QueueApp {
-  constructor(queueAdapter) {
-    const app = express();
+export default function ({ queueAdapter }) {
+  const app = express();
+  const middleware = Hull.Middleware({ hostSecret: process.env.SECRET || "1234" });
+  app
+    .use(bodyParser.json())
+    .use((req, res, next) => {
+      middleware(req, res, () => {
+        next();
+      });
+    })
+    .use(AppMiddleware(queueAdapter));
+  app.engine("html", renderFile);
+  app.set("views", `${__dirname}/../../views`);
+  app.set("view engine", "ejs");
 
-    app.use(bodyParser.json())
-      .use(HullClientMiddleware)
-      .use(ShipMiddleware)
-      .use(AppMiddleware(queueAdapter))
-      .use(express.static(path.resolve(__dirname, "..", "dist")))
-      .use(express.static(path.resolve(__dirname, "..", "assets")));
-
-    app.engine("html", renderFile);
-
-    return app;
-  }
+  return app;
 }

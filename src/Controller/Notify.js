@@ -7,7 +7,7 @@ export default class UserUpdateStrategy {
     const { user } = message;
 
     return req.app.hullAgent.shouldSyncUser(user)
-      && req.app.QueueAgent.create("exportUsersJob", [user]);
+      && req.app.queueAgent.create("exportUsersJob", [user]);
   }
 
   shipUpdateHandler(payload, { req }) {
