@@ -1,7 +1,7 @@
+import { NotifHandler } from "hull";
+
 export default class UserUpdateStrategy {
-
-
-  handleUserUpdate(payload, { req }) {
+  userUpdateHandler(payload, { req }) {
     const message = payload.message;
 
     const { user } = message;
@@ -10,4 +10,7 @@ export default class UserUpdateStrategy {
       && req.app.QueueAgent.create("exportUsersJob", [user]);
   }
 
+  shipUpdateHandler(payload, { req }) {
+    const message = payload.message;
+  }
 }
