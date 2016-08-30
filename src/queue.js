@@ -9,11 +9,12 @@ import controllers from "./bootstrap";
 import QueueApp from "./app/queue-app";
 import QueueRouter from "./router/queue-router";
 
+const hostSecret = process.env.SECRET || "1234";
 const queueAdapter = new KueAdapter(kue.createQueue({
   redis: process.env.REDIS_URL
 }));
 
-new QueueApp(queueAdapter)
+new QueueApp({ queueAdapter, hostSecret })
   .use(QueueRouter(controllers))
   .process();
 

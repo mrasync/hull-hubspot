@@ -6,9 +6,9 @@ import hullClientMiddleware from "../lib/middleware/hull-client";
 
 import AppMiddleware from "../lib/middleware/app";
 
-export default function ({ queueAdapter }) {
+export default function ({ queueAdapter, hostSecret }) {
   const app = express();
-  const middleware = hullClientMiddleware(Hull, { hostSecret: process.env.SECRET || "1234" });
+  const middleware = hullClientMiddleware(Hull, { hostSecret });
   app
     .use(bodyParser.json())
     .use((req, res, next) => {

@@ -3,7 +3,8 @@ import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
 
 export default class HubspotClient {
-  constructor(accessToken, refreshToken) {
+  constructor({ accessToken, refreshToken, hullClient }) {
+    this.hullClient = hullClient;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
     this.req = request;
@@ -15,7 +16,7 @@ export default class HubspotClient {
       .use(superagentPromisePlugin)
       .query({ access_token: this.accessToken })
       .on("request", (reqData) => {
-        console.log("REQ", reqData.url);
+        this.hullClient.logger.debug("hubspotClient.req", reqData.url);
       });
   }
 

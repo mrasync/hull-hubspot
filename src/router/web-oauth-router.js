@@ -5,18 +5,21 @@ export default function (deps) {
   const router = Router();
 
   const {
-    Hull
+    Hull,
+    hostSecret,
+    clientID,
+    clientSecret
   } = deps;
 
   const { OAuthHandler } = Hull;
 
   router.use("/auth", OAuthHandler({
-    hostSecret: process.env.SECRET || "1234",
+    hostSecret,
     name: "Hubspot",
     Strategy: HubspotStrategy,
     options: {
-      clientID: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
+      clientID,
+      clientSecret,
       scope: ["offline", "contacts-rw", "events-rw"],
       skipUserProfile: true
     },

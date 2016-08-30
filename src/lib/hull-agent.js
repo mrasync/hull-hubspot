@@ -31,14 +31,13 @@ export default class HullAgent {
   * @return {Promise}
   */
   importContacts(contacts) {
-    console.log("importContacts", contacts.length);
+    this.hullClient.logger.info("importContacts", contacts.length);
     return Promise.all(contacts.map((c) => {
       const email = _.get(_.find(c["identity-profiles"][0].identities, { type: "EMAIL" }), "value");
       if (!email) {
         return "";
       }
       const traits = this.mapping.getHullTraits(c);
-      console.log("HullAgent.importContacts.importing", email);
       return this.hullClient.as({ email }).traits(traits, { source: "hubspot" });
     }));
   }
@@ -48,7 +47,6 @@ export default class HullAgent {
   * @return {Promise -> lastImportTime (ISO 8601)} 2016-08-04T12:51:46Z
   */
   getLastUpdate() {
-    console.log("A");
     return this.hullClient.get("/search/user_reports", {
       include: ["traits_hubspot/fetched_at"],
       sort: {

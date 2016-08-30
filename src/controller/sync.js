@@ -4,7 +4,7 @@ export default class SyncStrategy {
     const count = 100;
     return req.shipApp.hullAgent.getLastUpdate()
         .then((lastImportTime) => {
-          console.log(lastImportTime);
+          req.hull.client.logger.info("syncAction.lastImportTime", lastImportTime);
           return req.shipApp.queueAgent.create("syncJob", {
             lastImportTime,
             count

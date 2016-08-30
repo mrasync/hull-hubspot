@@ -5,7 +5,8 @@ import Hull from "hull";
 import AppMiddleware from "../lib/middleware/app";
 
 export default class QueueApp {
-  constructor(queueAdapter) {
+  constructor({ queueAdapter, hostSecret }) {
+    this.hostSecret = hostSecret;
     this.queueAdapter = queueAdapter;
     this.handlers = {};
     this.supply = new Supply();
@@ -17,7 +18,6 @@ export default class QueueApp {
 
   process() {
     this.queueAdapter.process("queueApp", (job) => {
-      console.log("PROCESS", job.data.name);
       return this.dispatch(job.data.name, job.data.context, job.data.payload);
     });
   }
@@ -33,7 +33,7 @@ export default class QueueApp {
 
     return Promise.fromCallback((callback) => {
       this.supply
-        .use(Hull.Middleware({ hostSecret: process.env.SECRET || "1234" }))
+        .use(Hull.Middleware({ hostSecret: this.hostSecret }))
         .use(AppMiddleware(this.queueAdapter))
         .each(req, res, callback);
     })

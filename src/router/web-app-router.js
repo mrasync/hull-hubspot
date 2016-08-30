@@ -8,7 +8,8 @@ export default function (deps) {
     monitorController,
     fetchAllController,
     notifyController,
-    syncController
+    syncController,
+    hostSecret
   } = deps;
   const { NotifHandler } = Hull;
 
@@ -17,7 +18,7 @@ export default function (deps) {
   router.post("/sync", syncController.syncAction.bind(syncController));
 
   router.post("/notify", NotifHandler({
-    hostSecret: process.env.SECRET || "1234",
+    hostSecret,
     groupTraits: false,
     handlers: {
       "segment:update": notifyController.segmentUpdateHandler.bind(notifyController),

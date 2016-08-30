@@ -11,14 +11,17 @@ import WebAppRouter from "./router/web-app-router";
 import WebStaticRouter from "./router/web-static-router";
 import WebOauthRouter from "./router/web-oauth-router";
 
+const hostSecret = process.env.SECRET || "1234";
+const clientID = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
 const queueAdapter = new KueAdapter(kue.createQueue({
   redis: process.env.REDIS_URL
 }));
 
-WebApp({ queueAdapter })
-  .use("/", WebAppRouter({ ...controllers, Hull }))
+WebApp({ queueAdapter, hostSecret })
+  .use("/", WebAppRouter({ ...controllers, Hull, hostSecret }))
   .use("/", WebStaticRouter({ Hull }))
-  .use("/", WebOauthRouter({ Hull }))
+  .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret }))
   .listen(process.env.PORT || 8082, () => {
     Hull.logger.info("webApp.listen");
   });
