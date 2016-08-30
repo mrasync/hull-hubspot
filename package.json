@@ -31,7 +31,8 @@
     "test:modules": "npm outdated --depth=0",
     "clean": "./node_modules/.bin/rimraf dist; ./node_modules/.bin/rimraf lib",
     "update": "./node_modules/.bin/updtr",
-    "watch": "babel-watch -L src/index.js",
+    "watch:queue": "babel-watch -L src/queue.js",
+    "watch:web": "babel-watch -L src/web.js",
     "postinstall": "npm run build"
   },
   "keywords": [

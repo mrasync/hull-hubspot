@@ -9,13 +9,20 @@ services:
             - "8082:8082"
         volumes:
             - .:/app
-    watch:
+    watch-queue:
         image: node:5
         env_file: .env
-        entrypoint: npm run watch
+        entrypoint: npm run watch:queue
         working_dir: /app
         ports:
             - "8082:8082"
+        volumes:
+            - .:/app
+    watch-web:
+        image: node:5
+        env_file: .env
+        entrypoint: npm run watch:web
+        working_dir: /app
         volumes:
             - .:/app
     redis:
