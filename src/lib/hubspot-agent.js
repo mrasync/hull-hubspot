@@ -23,7 +23,6 @@ export default class HubspotAgent {
         if (err.response.statusCode === 401) {
           return this.hubspotClient.refreshAccessToken()
             .then((res) => {
-              this.hullClient.logger.debug("HubspotAgent.refreshToken");
               return this.hullAgent.updateShipSettings({
                 token: res.body.access_token
               });

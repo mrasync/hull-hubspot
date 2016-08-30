@@ -30,8 +30,8 @@ export default class HullAgent {
   * @param  {Array} Hubspot contacts
   * @return {Promise}
   */
-  importContacts(contacts) {
-    this.hullClient.logger.info("importContacts", contacts.length);
+  saveContacts(contacts) {
+    this.hullClient.logger.info("saveContacts", contacts.length);
     return Promise.all(contacts.map((c) => {
       const email = _.get(_.find(c["identity-profiles"][0].identities, { type: "EMAIL" }), "value");
       if (!email) {

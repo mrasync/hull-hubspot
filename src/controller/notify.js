@@ -1,6 +1,7 @@
 import Promise from "bluebird";
-import BatchSyncHandler from "../lib/batch-sync-handler";
 import _ from "lodash";
+
+import BatchSyncHandler from "../lib/batch-sync-handler";
 
 export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
@@ -23,21 +24,20 @@ export default class UserUpdateStrategy {
       return req.shipApp.queueAgent.create("exportUsersJob", { users });
     })
     .add(user);
-
   }
 
   shipUpdateHandler(payload, { req }) {
-    const message = payload.message;
+    const message = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup();
   }
 
   segmentUpdateHandler(payload, { req }) {
-    const message = payload.message;
+    const message = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup();
   }
 
   segmentDeleteHandler(payload, { req }) {
-    const message = payload.message;
+    const message = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup();
   }
 }

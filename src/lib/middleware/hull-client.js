@@ -59,7 +59,6 @@ module.exports = function hullClientMiddlewareFactory(Client, { hostSecret, fetc
         const client = req.hull.client = new Client({ id, secret, organization });
         req.hull.token = jwt.encode(config, hostSecret);
         if (fetchShip) {
-
           const bust = (message && message.Subject === "ship:update");
           // Promise<ship>
           return getCurrentShip(id, client, bust).then((ship = {}) => {

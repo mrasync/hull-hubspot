@@ -1,8 +1,8 @@
 import Promise from "bluebird";
 
-export default class ExportController {
+export default class UsersController {
   /**
-   * Exports Hull users to Hubspot contacts using create or update strategy.
+   * Sends Hull users to Hubspot contacts using create or update strategy.
    * The job on Hubspot side is done async the returned Promise is resolved
    * when the query was queued successfully. It is rejected when:
    * "you pass an invalid email address, if a property in your request doesn't exist,
@@ -11,11 +11,11 @@ export default class ExportController {
    * @param  {Array} users users from Hull
    * @return {Promise}
    */
-  exportUsersJob(req) {
+  sendUsersJob(req) {
     const users = req.payload.users;
-    req.hull.client.logger.log("exportUsers", users.length);
+    req.hull.client.logger.log("sendUsersJob", users.length);
     if (users.length > 100) {
-      req.hull.client.logger.warning("exportUsers works best for under 100 users at once", users.length);
+      req.hull.client.logger.warning("sendUsersJob works best for under 100 users at once", users.length);
     }
 
     const body = users.map((user) => {
@@ -40,5 +40,16 @@ export default class ExportController {
         }
         return Promise.reject(new Error("Error in create/update batch"));
       });
+  }
+
+  /**
+   * creates or updates users
+   * @see https://www.hull.io/docs/references/api/#endpoint-traits
+   * @param  {Array} Hubspot contacts
+   * @return {Promise}
+   */
+  saveContactsJob(req) {
+    const contacts = req.payload.contacts;
+    return req.shipApp.hullAgent.saveContacts(contacts);
   }
 }

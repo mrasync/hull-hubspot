@@ -1,8 +1,6 @@
 import kue from "kue";
 import Hull from "hull";
-import Promise from "bluebird";
 
-import BatchSyncHandler from "./lib/batch-sync-handler";
 import KueAdapter from "./lib/adapter/kue";
 import controllers from "./bootstrap";
 
