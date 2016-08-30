@@ -28,7 +28,7 @@ export default function (deps) {
     }
   }));
 
-  router.get("/monitor/checkToken", monitorController.checkTokenAction.bind(monitorController));
+  router.post("/monitor/checkToken", monitorController.checkTokenAction.bind(monitorController));
 
   return router;
 }

@@ -21,7 +21,7 @@ export default class UserUpdateStrategy {
         throttle: 30000
       }
     }).setCallback((users) => {
-      return req.shipApp.queueAgent.create("exportUsersJob", { users });
+      return req.shipApp.queueAgent.create("sendUsersJob", { users });
     })
     .add(user);
   }

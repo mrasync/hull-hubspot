@@ -29,7 +29,7 @@ export default class SyncStrategy {
         }
 
         if (res.body.contacts.length > 0) {
-          promises.push(req.shipApp.queueAgent.create("importContactsJob", {
+          promises.push(req.shipApp.queueAgent.create("saveContactsJob", {
             contacts: res.body.contacts
           }));
         }

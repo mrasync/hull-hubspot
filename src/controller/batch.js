@@ -22,7 +22,7 @@ export default class BatchController {
   handleBatchExtractJob(req) {
     return req.shipApp.hullAgent.handleExtract(req.payload.body, req.payload.chunkSize, (usersBatch) => {
       const filteredUsers = usersBatch.filter((user) => req.shipApp.hullAgent.shouldSyncUser(user));
-      return req.shipApp.queueAgent.create("exportUsersJob", {
+      return req.shipApp.queueAgent.create("sendUsersJob", {
         users: filteredUsers
       });
     });
