@@ -2,12 +2,13 @@ import express from "express";
 import bodyParser from "body-parser";
 import { renderFile } from "ejs";
 import Hull from "hull";
+import hullClientMiddleware from "../lib/middleware/hull-client";
 
 import AppMiddleware from "../lib/middleware/app";
 
 export default function ({ queueAdapter }) {
   const app = express();
-  const middleware = Hull.Middleware({ hostSecret: process.env.SECRET || "1234" });
+  const middleware = hullClientMiddleware(Hull, { hostSecret: process.env.SECRET || "1234" });
   app
     .use(bodyParser.json())
     .use((req, res, next) => {
