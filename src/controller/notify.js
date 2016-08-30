@@ -1,10 +1,16 @@
+import Promise from "bluebird";
 import BatchSyncHandler from "../lib/batch-sync-handler";
+import _ from "lodash";
 
 export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
     const message = payload.message;
 
-    const { user } = message;
+    const { user, changes = {} } = message;
+
+    if (_.get(changes, "user['traits_hubspot/fetched_at'][1]", false)) {
+      return Promise.resolve();
+    }
 
     return BatchSyncHandler.getHandler({
       hull: req.hull,
