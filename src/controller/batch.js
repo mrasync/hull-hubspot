@@ -6,7 +6,7 @@ export default class BatchController {
    * @return {Promise}
    */
   handleBatchExtractAction(req, res) {
-    return req.app.queueAgent.create("handleBatchExtractJob", {
+    return req.shipApp.queueAgent.create("handleBatchExtractJob", {
       body: req.body,
       chunkSize: 100
     })
@@ -20,9 +20,9 @@ export default class BatchController {
    * @return {Promise}
    */
   handleBatchExtractJob(req) {
-    return req.app.hullAgent.handleExtract(req.payload.body, req.payload.chunkSize, (usersBatch) => {
-      const filteredUsers = usersBatch.filter((user) => req.app.hullAgent.shouldSyncUser(user));
-      return req.app.queueAgent.create("exportUsersJob", {
+    return req.shipApp.hullAgent.handleExtract(req.payload.body, req.payload.chunkSize, (usersBatch) => {
+      const filteredUsers = usersBatch.filter((user) => req.shipApp.hullAgent.shouldSyncUser(user));
+      return req.shipApp.queueAgent.create("exportUsersJob", {
         users: filteredUsers
       });
     });

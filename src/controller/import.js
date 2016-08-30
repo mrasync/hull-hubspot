@@ -8,6 +8,6 @@ export default class ImportController {
    */
   importContactsJob(req) {
     const contacts = req.payload.contacts;
-    return req.app.hullAgent.importContacts(contacts);
+    return req.shipApp.hullAgent.importContacts(contacts);
   }
 }

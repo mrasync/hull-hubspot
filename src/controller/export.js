@@ -13,22 +13,22 @@ export default class ExportController {
    */
   exportUsersJob(req) {
     const users = req.payload.users;
-    console.log("exportUsersJob", users.length);
+    req.hull.client.logger.log("exportUsers", users.length);
     if (users.length > 100) {
-      req.hull.client.logger.warning("exportUsers works best for under 100 users at once", users.count);
+      req.hull.client.logger.warning("exportUsers works best for under 100 users at once", users.length);
     }
 
     const body = users.map((user) => {
       user["hubspot/first_name"] = "John";
       user["hubspot/last_name"] = "Doe";
-      const properties = req.app.mapping.getHubspotProperties(user);
+      const properties = req.shipApp.mapping.getHubspotProperties(user);
       return {
         email: user.email,
         properties
       };
     });
 
-    return req.app.hubspotClient.post("/contacts/v1/contact/batch/")
+    return req.shipApp.hubspotClient.post("/contacts/v1/contact/batch/")
       .query({
         auditId: "Hull"
       })

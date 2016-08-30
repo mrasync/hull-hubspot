@@ -8,7 +8,7 @@ export default class FetchAllController {
    */
   fetchAllAction(req, res) {
     const count = 100;
-    return req.app.queueAgent.create("fetchAllJob", {
+    return req.shipApp.queueAgent.create("fetchAllJob", {
       count
     })
     .then(() => res.end("ok"));
@@ -24,18 +24,18 @@ export default class FetchAllController {
     const count = req.payload.count;
     const offset = req.payload.offset || 0;
 
-    return req.app.hubspotAgent.getContacts(count, offset)
+    return req.shipApp.hubspotAgent.getContacts(count, offset)
       .then((data) => {
         const promises = [];
         if (data.body["has-more"]) {
-          promises.push(req.app.queueAgent.create("fetchAllJob", {
+          promises.push(req.shipApp.queueAgent.create("fetchAllJob", {
             count,
             offset: data.body["vid-offset"]
           }));
         }
 
         if (data.body.contacts.length > 0) {
-          promises.push(req.app.queueAgent.create("importContactsJob", {
+          promises.push(req.shipApp.queueAgent.create("importContactsJob", {
             contacts: data.body.contacts
           }));
         }

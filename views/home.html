@@ -65,7 +65,7 @@
           closeOnConfirm: false
         }, function(isConfirm) {
           if (isConfirm) {
-            $.post(url);
+            $.post(url+window.location.search);
             swal("Fetching started", "The Hubspot contacts will be fetched shortly.", "success");
           }
         });
