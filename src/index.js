@@ -1,6 +1,8 @@
 import kue from "kue";
 import Hull from "hull";
+import Promise from "bluebird";
 
+import BatchSyncHandler from "./lib/batch-sync-handler";
 import KueAdapter from "./lib/adapter/kue";
 import BatchController from "./controller/batch";
 import MonitorController from "./controller/monitor";
@@ -42,3 +44,20 @@ WebApp({ queueAdapter })
 new QueueApp(queueAdapter)
   .use(QueueRouter(controllers))
   .process();
+
+function exitNow() {
+  console.warn("Exiting now !");
+  process.exit(0);
+}
+
+function handleExit() {
+  console.log("Exiting... waiting 30 seconds workers to flush");
+  setTimeout(exitNow, 30000);
+  Promise.all([
+    queueAdapter.exit(),
+    BatchSyncHandler.exit()
+  ]).then(exitNow);
+}
+
+process.on("SIGINT", handleExit);
+process.on("SIGTERM", handleExit);

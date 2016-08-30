@@ -6,6 +6,7 @@ const HANDLERS = {};
 export default class BatchSyncHandler {
 
   static exit() {
+    console.log("BatchSyncHandler.exit");
     if (!BatchSyncHandler.exiting) {
       const exiting = Promise.all(_.map(HANDLERS, (h) => h.flush()));
       BatchSyncHandler.exiting = exiting;
