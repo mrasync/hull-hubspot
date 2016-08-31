@@ -30,7 +30,7 @@
     },
     {
       "name": "portal_id",
-      "title": "Token",
+      "title": "Portal ID",
       "type": "string",
       "format": "hidden"
     },
