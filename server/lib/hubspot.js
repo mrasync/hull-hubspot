@@ -26,7 +26,7 @@ function buildHullSegmentsProperty(segments = []) {
     description: "All the Segments the User belongs to in Hull",
     label: "Hull Segments",
     groupName: "hull",
-    fieldType: "text",
+    fieldType: "checkbox",
     formField: false,
     name: "hull_segments",
     type: "enumeration",
