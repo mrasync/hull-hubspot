@@ -5,11 +5,11 @@ export default class Mapping {
     this.ship = ship;
 
     this.map = [
-        { name: "email", hull: "email", type: "string", title: "Email" },
-        { name: "salutation", hull: "hubspot/salutation", type: "string", title: "Salutation" },
-        { name: "firstname", hull: "hubspot/first_name", type: "string", title: "First Name" },
-        { name: "lastname", hull: "hubspot/last_name", type: "string", title: "Last Name" },
-        { name: "phone", hull: "hubspot/phone", type: "string", title: "Phone Number" }
+      { name: "email", hull: "email", type: "string", title: "Email" },
+      { name: "salutation", hull: "salutation", type: "string", title: "Salutation" },
+      { name: "firstname", hull: "first_name", type: "string", title: "First Name" },
+      { name: "lastname", hull: "last_name", type: "string", title: "Last Name" },
+      { name: "phone", hull: "phone", type: "string", title: "Phone Number" }
     ];
   }
 
