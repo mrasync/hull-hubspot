@@ -33,7 +33,7 @@ export default function (deps) {
       return hull.put(ship.id, {
         private_settings: {
           ...ship.private_settings,
-          portalId: req.authParams.portalId
+          portal_id: req.authParams.portalId
         }
       });
     },
