@@ -27,12 +27,12 @@
     "start": "node ./lib",
     "start:dev": "NODE_ENV=development ./node_modules/.bin/nodemon -V -w server -x ./node_modules/.bin/babel-node -- server",
     "test": "npm run test:lint && npm run test:modules",
-    "test:lint": "eslint src",
+    "test:lint": "eslint server",
     "test:modules": "npm outdated --depth=0",
     "clean": "./node_modules/.bin/rimraf dist; ./node_modules/.bin/rimraf lib",
     "update": "./node_modules/.bin/updtr",
-    "watch:queue": "babel-watch -L src/queue.js",
-    "watch:web": "babel-watch -L src/web.js",
+    "watch:queue": "babel-watch -L server/queue.js",
+    "watch:web": "babel-watch -L server/web.js",
     "postinstall": "npm run build"
   },
   "keywords": [
