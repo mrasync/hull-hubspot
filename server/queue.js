@@ -1,16 +1,12 @@
-import kue from "kue";
 import Hull from "hull";
-
-import KueAdapter from "./lib/adapter/kue";
-import controllers from "./bootstrap";
 
 import QueueApp from "./app/queue-app";
 import QueueRouter from "./router/queue-router";
+import bootstrap from "./bootstrap";
+
+const { queueAdapter, controllers } = bootstrap;
 
 const hostSecret = process.env.SECRET || "1234";
-const queueAdapter = new KueAdapter(kue.createQueue({
-  redis: process.env.REDIS_URL
-}));
 
 new QueueApp({ queueAdapter, hostSecret })
   .use(QueueRouter(controllers))

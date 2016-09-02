@@ -1,2 +1,2 @@
-web: NODE_ENV=production node lib/web
-worker: NODE_ENV=production node lib/queue
+web: NODE_ENV=production node build/web
+worker: NODE_ENV=production node build/queue

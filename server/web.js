@@ -1,21 +1,17 @@
-import kue from "kue";
 import Hull from "hull";
 
 import BatchSyncHandler from "./lib/batch-sync-handler";
-import KueAdapter from "./lib/adapter/kue";
-import controllers from "./bootstrap";
-
 import WebApp from "./app/web-app";
 import WebAppRouter from "./router/web-app-router";
 import WebStaticRouter from "./router/web-static-router";
 import WebOauthRouter from "./router/web-oauth-router";
+import bootstrap from "./bootstrap";
+
+const { queueAdapter, controllers } = bootstrap;
 
 const hostSecret = process.env.SECRET || "1234";
 const clientID = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-const queueAdapter = new KueAdapter(kue.createQueue({
-  redis: process.env.REDIS_URL
-}));
 
 WebApp({ queueAdapter, hostSecret })
   .use("/", WebAppRouter({ ...controllers, Hull, hostSecret }))
