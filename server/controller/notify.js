@@ -7,11 +7,13 @@ export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
     const message = payload.message;
 
-    const { user, changes = {} } = message;
+    const { user, changes = {}, segments = [] } = message;
 
     if (_.get(changes, "user['traits_hubspot/fetched_at'][1]", false)) {
       return Promise.resolve();
     }
+
+    user.segment_ids = _.concat(user.segment_ids || [], segments.map(s => s.id));
 
     if (!req.shipApp.hullAgent.shouldSyncUser(user)) {
       return Promise.resolve();

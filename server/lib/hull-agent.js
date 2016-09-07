@@ -38,7 +38,7 @@ export default class HullAgent {
         return "";
       }
       const traits = this.mapping.getHullTraits(c);
-      return this.hullClient.as({ email }).traits(traits, { source: "hubspot" });
+      return this.hullClient.as({ email }).traits(traits);
     }));
   }
 
