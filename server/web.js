@@ -13,8 +13,8 @@ const hostSecret = process.env.SECRET || "1234";
 const clientID = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 
-WebApp({ queueAdapter, hostSecret })
-  .use("/", WebAppRouter({ ...controllers, Hull, hostSecret }))
+WebApp()
+  .use("/", WebAppRouter({ ...controllers, Hull, hostSecret, queueAdapter }))
   .use("/", WebStaticRouter({ Hull }))
   .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret }))
   .listen(process.env.PORT || 8082, () => {

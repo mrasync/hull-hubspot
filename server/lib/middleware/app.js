@@ -8,7 +8,7 @@ export default function (queueAdapter) {
   return function middleware(req, res, next) {
     req.shipApp = req.shipApp || {};
 
-    if (!req.hull.ship) {
+    if (!req.hull || !req.hull.ship) {
       return next();
     }
 

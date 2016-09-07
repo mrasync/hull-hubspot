@@ -16,7 +16,7 @@ export default class HubspotClient {
       .use(superagentPromisePlugin)
       .query({ access_token: this.accessToken })
       .on("request", (reqData) => {
-        this.hullClient.logger.debug("hubspotClient.req", reqData.url);
+        this.hullClient.logger.info("hubspotClient.req", reqData.url);
       });
   }
 
