@@ -3,6 +3,7 @@ import Mapping from "../mapping";
 import HullAgent from "../hull-agent";
 import HubspotAgent from "../hubspot-agent";
 import QueueAgent from "../queue-agent";
+import ProgressAgent from "../progress-agent";
 
 export default function (queueAdapter) {
   return function middleware(req, res, next) {
@@ -19,6 +20,7 @@ export default function (queueAdapter) {
     req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping);
     req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient);
     req.shipApp.queueAgent = new QueueAgent(queueAdapter, req);
+    req.shipApp.progressAgent = new ProgressAgent(req.hull.ship, req.hull.client);
 
     return next();
   };

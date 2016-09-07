@@ -23,6 +23,14 @@
           </div>
           <div class="mb-1 media ps-4 pb-1">
             <div data-href="/fetchAll" class="btn btn-rounded btn-pill btn-primary center-block">Fetch All Contacts</div>
+            <% if (settings.last_fetch_started_at) { %>
+              <%=settings.is_fetch_completed%>
+              <% if (settings.is_fetch_completed) { %>
+                <p>Last fetch all operation started <span data-time>placeholder</span> and processed all <%=settings.fetch_count || 0%> contacts.</a>
+              <% } else { %>
+                <p>Last fetch all operation started <span data-time>placeholder</span> and already processed <%=settings.fetch_count || 0%> contacts.</a>
+              <% } %>
+            <% } %>
           </div>
         </div>
       </div>
@@ -72,5 +80,12 @@
       });
     });
   </script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js" integrity="sha256-De/cgZoAkgvqoxL9yJpJzPHyozUETFnSv7EQGfQWQ4o=" crossorigin="anonymous"></script>
+  <script>jQuery(function($) {
+    var time = "<%=settings.last_fetch_started_at%>";
+    if (time) {
+      $("[data-time]").text(moment("<%=settings.last_fetch_started_at%>").fromNow());
+    }
+  });</script>
 </body>
 </html>
