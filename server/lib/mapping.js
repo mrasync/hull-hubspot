@@ -62,8 +62,8 @@ export default class Mapping {
     const userSegments = userData.segment_ids || [];
 
     const segmentNames = userSegments.map(segmentId => {
-      return _.get(_.find(segments, { "id": segmentId }), "name");
-    })
+      return _.get(_.find(segments, { id: segmentId }), "name");
+    });
 
     contactProps.push({
       property: "hull_segments",

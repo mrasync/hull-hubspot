@@ -1,5 +1,3 @@
-import _ from "lodash";
-import Promise from "bluebird";
 import moment from "moment";
 
 export default class progressAgent {

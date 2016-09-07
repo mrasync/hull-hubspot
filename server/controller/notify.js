@@ -46,7 +46,9 @@ export default class UserUpdateStrategy {
   }
 
   segmentDeleteHandler(payload, { req }) {
-    const segment = payload.message;
+    // TODO: if the segment would have `query` param we could trigger an extract
+    // for deleted segment
+    const segment = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup()
       .then(() => {
         const segments = req.hull.ship.private_settings.synchronized_segments;

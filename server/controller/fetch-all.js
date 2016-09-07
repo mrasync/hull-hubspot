@@ -14,7 +14,7 @@ export default class FetchAllController {
     })
     .then(() => {
       req.shipApp.progressAgent.start();
-      res.end("ok")
+      res.end("ok");
     });
   }
 

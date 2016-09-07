@@ -26,7 +26,7 @@ export default function (deps) {
       if (req.query.ship || (req.hull && req.hull.token)) {
         return Middleware({ hostSecret, fetchShip: true, cacheShip: true })(req, res, next);
       }
-      next();
+      return next();
     })
     .use(AppMiddleware(queueAdapter));
 
