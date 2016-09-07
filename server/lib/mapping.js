@@ -54,8 +54,8 @@ export default class Mapping {
    * @param  {Object} userData Hull user object
    * @return {Array}           Hubspot properties array
    */
-  getHubspotProperties(userData) {
-    return _.reduce(this.map, (props, prop) => {
+  getHubspotProperties(segments, userData) {
+    const contactProps = _.reduce(this.map, (props, prop) => {
       const value = _.get(userData, prop.hull);
       if (value) {
         props.push({
@@ -65,5 +65,17 @@ export default class Mapping {
       }
       return props;
     }, []);
+    const userSegments = userData.segment_ids || [];
+
+    const segmentNames = userSegments.map(segmentId => {
+      return _.get(_.find(segments, { "id": segmentId }), "name");
+    })
+
+    contactProps.push({
+      property: "hull_segments",
+      value: segmentNames.join(";")
+    });
+
+    return contactProps;
   }
 }

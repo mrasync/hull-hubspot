@@ -18,20 +18,23 @@ export default class UsersController {
       req.hull.client.logger.warning("sendUsersJob works best for under 100 users at once", users.length);
     }
 
-    const body = users.map((user) => {
-      const properties = req.shipApp.mapping.getHubspotProperties(user);
-      return {
-        email: user.email,
-        properties
-      };
-    });
+    req.shipApp.hullAgent.getSegments()
+      .then(segments => {
+        const body = users.map((user) => {
+          const properties = req.shipApp.mapping.getHubspotProperties(segments, user);
+          return {
+            email: user.email,
+            properties
+          };
+        });
 
-    return req.shipApp.hubspotClient.post("/contacts/v1/contact/batch/")
-      .query({
-        auditId: "Hull"
+        return req.shipApp.hubspotClient.post("/contacts/v1/contact/batch/")
+          .query({
+            auditId: "Hull"
+          })
+          .set("Content-Type", "application/json")
+          .send(body);
       })
-      .set("Content-Type", "application/json")
-      .send(body)
       .then(res => {
         if (res.statusCode === 202) {
           return Promise.resolve();
