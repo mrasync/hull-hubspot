@@ -8,7 +8,7 @@ export default class QueueAgent {
   }
 
   create(jobName, jobPayload) {
-    const context = _.pick(this.req, ["query"]);
+    const context = _.pick(this.req, ["query", "hostname"]);
     this.hullClient.logger.log("queueAgent", jobName, _.keys(jobPayload));
     return this.queueAdapter.create("queueApp", {
       name: jobName,

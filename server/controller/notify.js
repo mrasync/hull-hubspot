@@ -13,7 +13,7 @@ export default class UserUpdateStrategy {
       return Promise.resolve();
     }
 
-    user.segment_ids = _.concat(user.segment_ids || [], segments.map(s => s.id));
+    user.segment_ids = _.uniq(_.concat(user.segment_ids || [], segments.map(s => s.id)));
 
     if (!req.shipApp.hullAgent.shouldSyncUser(user)) {
       return Promise.resolve();
@@ -38,12 +38,24 @@ export default class UserUpdateStrategy {
   }
 
   segmentUpdateHandler(payload, { req }) {
-    const message = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup();
+    const segment = payload.message;
+    return req.shipApp.hubspotAgent.syncHullGroup()
+      .then(() => {
+        return req.shipApp.hullAgent.requestExtract({ segment });
+      });
   }
 
   segmentDeleteHandler(payload, { req }) {
-    const message = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup();
+    const segment = payload.message;
+    return req.shipApp.hubspotAgent.syncHullGroup()
+      .then(() => {
+        const segments = req.hull.ship.private_settings.synchronized_segments;
+        if (segments.length === 0) {
+          return req.shipApp.hullAgent.requestExtract({});
+        }
+        return Promise.map(segments, segmentId => {
+          return req.shipApp.hullAgent.requestExtract({ segment: { id: segmentId }, remove: true });
+        });
+      });
   }
 }

@@ -5,12 +5,15 @@ import ps from "promise-streams";
 import BatchStream from "batch-stream";
 import JSONStream from "JSONStream";
 import request from "request";
+import URI from "urijs";
 
 export default class HullAgent {
-  constructor(ship, hullClient, mapping) {
+  constructor(ship, hullClient, mapping, query, hostname) {
     this.ship = ship;
     this.hullClient = hullClient;
     this.mapping = mapping;
+    this.query = query;
+    this.hostname = hostname;
   }
 
   getSegments() {
@@ -98,5 +101,41 @@ export default class HullAgent {
         }
       }))
       .wait();
+  }
+
+  requestExtract({ segment = null, format = "json", path = "batch", fields = [], remove = false }) {
+    const hostname = this.hostname;
+    const search = (this.query || {});
+    if (segment && !remove) {
+      search.segment_id = segment.id;
+    }
+    const url = URI(`https://${hostname}`)
+      .path(path)
+      .search(search)
+      .toString();
+
+    if (_.isEmpty(fields)) {
+      fields = this.mapping.getHullTraitsKeys();
+    }
+
+    fields.push("segment_ids");
+
+    return (() => {
+      if (segment == null) {
+        return Promise.resolve({
+          query: {}
+        });
+      }
+
+      if (segment.query) {
+        return Promise.resolve(segment);
+      }
+      return this.hullClient.get(segment.id);
+    })()
+    .then(({ query }) => {
+      const params = { query, format, url, fields };
+      console.log("REQUEST EXTRACT", params)
+      return this.hullClient.post("extract/user_reports", params);
+    });
   }
 }

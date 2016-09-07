@@ -17,7 +17,7 @@ export default function (queueAdapter) {
     const refreshToken = req.hull.ship.private_settings.refresh_token;
     req.shipApp.hubspotClient = new HubspotClient({ accessToken, refreshToken, hullClient: req.hull.client });
     req.shipApp.mapping = new Mapping(req.hull.ship);
-    req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping);
+    req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping, req.query, req.hostname);
     req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient);
     req.shipApp.queueAgent = new QueueAgent(queueAdapter, req);
     req.shipApp.progressAgent = new ProgressAgent(req.hull.ship, req.hull.client);
