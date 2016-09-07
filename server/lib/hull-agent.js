@@ -134,7 +134,6 @@ export default class HullAgent {
     })()
     .then(({ query }) => {
       const params = { query, format, url, fields };
-      console.log("REQUEST EXTRACT", params)
       return this.hullClient.post("extract/user_reports", params);
     });
   }

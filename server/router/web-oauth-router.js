@@ -29,7 +29,6 @@ export default function (deps) {
 
       if (token) {
         return hull.get(ship.id).then(s => {
-          console.log("@@@", s.private_settings);
           return { settings: s.private_settings };
         });
       }
