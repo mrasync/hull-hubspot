@@ -54,7 +54,7 @@
     {
       "url": "/sync",
       "type": "cron",
-      "value": "0 0 * * *"
+      "value": "*/5 * * * *"
     },
     {
       "url": "/monitor/checkToken",
