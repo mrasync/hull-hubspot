@@ -13,6 +13,10 @@ export default class UserUpdateStrategy {
       return Promise.resolve();
     }
 
+    if (!req.shipApp.hullAgent.shouldSyncUser(user)) {
+      return Promise.resolve();
+    }
+
     return BatchSyncHandler.getHandler({
       hull: req.hull,
       ship: req.hull.ship,

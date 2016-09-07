@@ -19,8 +19,6 @@ export default class UsersController {
     }
 
     const body = users.map((user) => {
-      user["hubspot/first_name"] = "John";
-      user["hubspot/last_name"] = "Doe";
       const properties = req.shipApp.mapping.getHubspotProperties(user);
       return {
         email: user.email,
