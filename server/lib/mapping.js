@@ -1,10 +1,10 @@
 import _ from "lodash";
-import map from "./mapping-data";
+import getMap from "./mapping-data";
 
 export default class Mapping {
   constructor(ship) {
     this.ship = ship;
-    this.map = map;
+    this.map = getMap();
   }
 
   /**
