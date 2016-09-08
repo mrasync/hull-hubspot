@@ -1,3 +1,4 @@
+import Promise from "bluebird";
 import request from "superagent";
 import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
@@ -11,6 +12,12 @@ export default class HubspotClient {
   }
 
   attach(req) {
+
+    if (!this.accessToken) {
+      this.hullClient.logger.error("No access token set");
+      return Promise.reject();
+    }
+
     return req
       .use(prefixPlugin("https://api.hubapi.com"))
       .use(superagentPromisePlugin)
