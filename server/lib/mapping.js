@@ -1,16 +1,10 @@
 import _ from "lodash";
+import map from "./mapping-data";
 
 export default class Mapping {
   constructor(ship) {
     this.ship = ship;
-
-    this.map = [
-      { name: "email", hull: "email", type: "string", title: "Email" },
-      { name: "salutation", hull: "salutation", type: "string", title: "Salutation" },
-      { name: "firstname", hull: "first_name", type: "string", title: "First Name" },
-      { name: "lastname", hull: "last_name", type: "string", title: "Last Name" },
-      { name: "phone", hull: "phone", type: "string", title: "Phone Number" }
-    ];
+    this.map = map;
   }
 
   /**
@@ -43,7 +37,7 @@ export default class Mapping {
       return traits;
     }, {});
 
-    hullTraits.fetched_at = new Date();
+    hullTraits["hubspot/fetched_at"] = new Date();
 
     return hullTraits;
   }
@@ -54,9 +48,9 @@ export default class Mapping {
    * @param  {Object} userData Hull user object
    * @return {Array}           Hubspot properties array
    */
-  getHubspotProperties(userData) {
-    return _.reduce(this.map, (props, prop) => {
-      const value = _.get(userData, prop.hull);
+  getHubspotProperties(segments, userData) {
+    const contactProps = _.reduce(this.map, (props, prop) => {
+      const value = _.get(userData, prop.hull) || _.get(userData, `traits_${prop.hull}`);
       if (value) {
         props.push({
           property: prop.name,
@@ -65,5 +59,17 @@ export default class Mapping {
       }
       return props;
     }, []);
+    const userSegments = userData.segment_ids || [];
+
+    const segmentNames = userSegments.map(segmentId => {
+      return _.get(_.find(segments, { id: segmentId }), "name");
+    });
+
+    contactProps.push({
+      property: "hull_segments",
+      value: segmentNames.join(";")
+    });
+
+    return contactProps;
   }
 }

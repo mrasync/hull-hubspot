@@ -16,13 +16,6 @@
       "format": "segment"
     },
     {
-      "name"        : "traits",
-      "title"       : "Synchronized Properties",
-      "description" : "Synchronize these properties to Hubspot",
-      "type"        : "array",
-      "format"      : "trait"
-    },
-    {
       "name": "token",
       "title": "Token",
       "type": "string",
@@ -39,6 +32,24 @@
       "title": "RefreshToken",
       "type": "string",
       "format": "hidden"
+    },
+    {
+      "name": "last_fetch_started_at",
+      "description": "Last time fetched at operation was started",
+      "type": "string",
+      "format": "hidden"
+    },
+    {
+      "name": "fetch_count",
+      "description": "Count of contacts already fetched from Hubspot",
+      "type": "number",
+      "format": "hidden"
+    },
+    {
+      "name": "is_fetch_completed",
+      "type": "boolean",
+      "default": false,
+      "format": "hidden"
     }
   ],
   "deployment_settings": [],
@@ -54,7 +65,7 @@
     {
       "url": "/sync",
       "type": "cron",
-      "value": "0 0 * * *"
+      "value": "*/5 * * * *"
     },
     {
       "url": "/monitor/checkToken",

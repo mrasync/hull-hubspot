@@ -1,4 +1,11 @@
 import { Router } from "express";
+import bodyParser from "body-parser";
+import { Middleware } from "hull";
+
+import NotifHandler from "../lib/hull/notif-handler";
+import ParseMessageMiddleware from "../lib/middleware/parse-message";
+import AppMiddleware from "../lib/middleware/app";
+
 
 export default function (deps) {
   const router = Router();
@@ -9,15 +16,25 @@ export default function (deps) {
     fetchAllController,
     notifyController,
     syncController,
-    hostSecret
+    hostSecret,
+    queueAdapter
   } = deps;
-  const { NotifHandler } = Hull;
 
-  router.post("/batch", batchController.handleBatchExtractAction.bind(batchController));
-  router.post("/fetchAll", fetchAllController.fetchAllAction.bind(fetchAllController));
-  router.post("/sync", syncController.syncAction.bind(syncController));
+  router
+    .use("/notify", ParseMessageMiddleware)
+    .use((req, res, next) => {
+      if (req.query.ship || (req.hull && req.hull.token)) {
+        return Middleware({ hostSecret, fetchShip: true, cacheShip: true })(req, res, next);
+      }
+      return next();
+    })
+    .use(AppMiddleware(queueAdapter));
 
-  router.post("/notify", NotifHandler({
+  router.post("/batch", bodyParser.json(), batchController.handleBatchExtractAction.bind(batchController));
+  router.post("/fetchAll", bodyParser.json(), fetchAllController.fetchAllAction.bind(fetchAllController));
+  router.post("/sync", bodyParser.json(), syncController.syncAction.bind(syncController));
+
+  router.post("/notify", NotifHandler(Hull, {
     hostSecret,
     groupTraits: false,
     handlers: {
@@ -28,7 +45,7 @@ export default function (deps) {
     }
   }));
 
-  router.post("/monitor/checkToken", monitorController.checkTokenAction.bind(monitorController));
+  router.post("/monitor/checkToken", bodyParser.json(), monitorController.checkTokenAction.bind(monitorController));
 
   return router;
 }

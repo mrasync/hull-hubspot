@@ -23,10 +23,16 @@ export default function (deps) {
       scope: ["offline", "contacts-rw", "events-rw"],
       skipUserProfile: true
     },
-    isSetup(req, { /* hull,*/ ship }) {
+    isSetup(req, { hull, ship }) {
       if (req.query.reset) return Promise.reject();
       const { token } = ship.private_settings || {};
-      return (token) ? Promise.resolve() : Promise.reject();
+
+      if (token) {
+        return hull.get(ship.id).then(s => {
+          return { settings: s.private_settings };
+        });
+      }
+      return Promise.reject();
     },
     onLogin: (req, { hull, ship }) => {
       req.authParams = { ...req.body, ...req.query };

@@ -7,9 +7,15 @@ export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
     const message = payload.message;
 
-    const { user, changes = {} } = message;
+    const { user, changes = {}, segments = [] } = message;
 
     if (_.get(changes, "user['traits_hubspot/fetched_at'][1]", false)) {
+      return Promise.resolve();
+    }
+
+    user.segment_ids = _.uniq(_.concat(user.segment_ids || [], segments.map(s => s.id)));
+
+    if (!req.shipApp.hullAgent.shouldSyncUser(user)) {
       return Promise.resolve();
     }
 
@@ -32,12 +38,26 @@ export default class UserUpdateStrategy {
   }
 
   segmentUpdateHandler(payload, { req }) {
-    const message = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup();
+    const segment = payload.message;
+    return req.shipApp.hubspotAgent.syncHullGroup()
+      .then(() => {
+        return req.shipApp.hullAgent.requestExtract({ segment });
+      });
   }
 
   segmentDeleteHandler(payload, { req }) {
-    const message = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup();
+    // TODO: if the segment would have `query` param we could trigger an extract
+    // for deleted segment
+    const segment = payload.message; // eslint-disable-line no-unused-vars
+    return req.shipApp.hubspotAgent.syncHullGroup()
+      .then(() => {
+        const segments = req.hull.ship.private_settings.synchronized_segments;
+        if (segments.length === 0) {
+          return req.shipApp.hullAgent.requestExtract({});
+        }
+        return Promise.map(segments, segmentId => {
+          return req.shipApp.hullAgent.requestExtract({ segment: { id: segmentId }, remove: true });
+        });
+      });
   }
 }

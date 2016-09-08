@@ -8,7 +8,7 @@ import NotifyController from "./controller/notify";
 import KueAdapter from "./lib/adapter/kue";
 
 const queueAdapter = new KueAdapter(({
-  prefix: process.env.KUE_PREFIX || 'hull-hubspot',
+  prefix: process.env.KUE_PREFIX || "hull-hubspot",
   redis: process.env.REDIS_URL
 }));
 
