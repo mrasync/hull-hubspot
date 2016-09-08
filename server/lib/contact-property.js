@@ -37,7 +37,7 @@ export default class ContactProperty {
     return {
       hidden: false,
       description: null,
-      value: name,
+      value: _.trim(name),
       readOnly: false,
       doubleData: 0.0,
       label: name,

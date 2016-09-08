@@ -35,7 +35,7 @@ export default class UserUpdateStrategy {
   shipUpdateHandler(payload, { req }) {
     const message = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup()
-      .catch((err) => req.hull.client.logger.error("Error in creating segments property", err));
+      .catch((err) => req.hull.client.logger.error("Error in creating segments property", err.response));
   }
 
   segmentUpdateHandler(payload, { req }) {
