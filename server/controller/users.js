@@ -36,14 +36,14 @@ export default class UsersController {
           .send(body);
       })
       .then(res => {
-        req.hull.client.logger.debug("Hubspot batch statusCode", res.statusCode);
+        req.hull.client.logger.info("Hubspot batch statusCode", res.statusCode);
 
         if (res.statusCode === 202) {
           return Promise.resolve();
         }
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
-        req.hull.client.logger.debug("Hubspot batch error", err);
+        req.hull.client.logger.info("Hubspot batch error", err);
       });
   }
 
