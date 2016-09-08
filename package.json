@@ -67,6 +67,7 @@
     "dotenv": "^2.0.0",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
+    "foreman": "^2.0.0",
     "hubspot": "unity/node-hubspot",
     "hull": "0.9.6",
     "jwt-simple": "^0.5.0",
