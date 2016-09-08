@@ -13,8 +13,21 @@ If you want your own instance: [![Deploy](https://www.herokucdn.com/deploy/butto
 
 - Fork
 - Install
+- Start Redis instance
+- Copy .env.sample -> .env and set CLIENT_ID, CLIENT_SECRET, REDIS_URL
 
 ```sh
 npm install
 npm start
+npm run start:dev # for autoreloading after changes
+```
+
+#### Docker based
+
+If you want Docker based development after setting `.env` file:
+
+```sh
+docker-compose run install
+docker-compose up -d redis
+docker-compose up dev # with autoreloading enabled
 ```

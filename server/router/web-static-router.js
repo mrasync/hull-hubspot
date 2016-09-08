@@ -6,8 +6,8 @@ export default function ({ Hull }) {
   const { Routes } = Hull;
   const { Readme, Manifest } = Routes;
 
-  router.use(express.static(path.resolve(__dirname, "..", "dist")));
-  router.use(express.static(path.resolve(__dirname, "..", "assets")));
+  router.use(express.static(path.resolve(__dirname, "..", "..", "dist")));
+  router.use(express.static(path.resolve(__dirname, "..", "..", "assets")));
 
   router.get("/manifest.json", Manifest(`${__dirname}/..`));
   router.get("/", Readme);

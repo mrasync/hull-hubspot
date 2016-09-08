@@ -12,13 +12,14 @@ const { queueAdapter, controllers } = bootstrap;
 const hostSecret = process.env.SECRET || "1234";
 const clientID = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
+const port = process.env.PORT || 8082;
 
 WebApp()
   .use("/", WebAppRouter({ ...controllers, Hull, hostSecret, queueAdapter }))
   .use("/", WebStaticRouter({ Hull }))
   .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret }))
-  .listen(process.env.PORT || 8082, () => {
-    Hull.logger.info("webApp.listen");
+  .listen(port, () => {
+    Hull.logger.info("webApp.listen", port);
   });
 
 function exitNow() {

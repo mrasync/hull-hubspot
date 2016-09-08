@@ -9,7 +9,7 @@ export default function () {
 
   app.use(TokenMiddleware);
   app.engine("html", renderFile);
-  app.use(express.static(path.resolve(__dirname, "..", "assets")));
+
   app.set("views", path.resolve(__dirname, "..", "..", "views"));
   app.set("view engine", "ejs");
 
