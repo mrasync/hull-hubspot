@@ -43,7 +43,7 @@ export default class UsersController {
         }
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
-        req.hull.client.logger.info("Hubspot batch error", err);
+        req.hull.client.logger.info("Hubspot batch error", err.response);
       });
   }
 
