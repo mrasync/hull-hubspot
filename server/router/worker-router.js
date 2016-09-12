@@ -1,0 +1,17 @@
+export default function (deps) {
+  const {
+    batchController,
+    fetchAllController,
+    usersController,
+    syncController
+  } = deps;
+
+  return function QueueRouter(workerApp) {
+    workerApp.attach("handleBatchExtractJob", batchController.handleBatchExtractJob.bind(batchController));
+    workerApp.attach("fetchAllJob", fetchAllController.fetchAllJob.bind(fetchAllController));
+    workerApp.attach("saveContactsJob", usersController.saveContactsJob.bind(usersController));
+    workerApp.attach("sendUsersJob", usersController.sendUsersJob.bind(usersController));
+    workerApp.attach("syncJob", syncController.syncJob.bind(syncController));
+    return workerApp;
+  };
+}

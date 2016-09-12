@@ -4,7 +4,7 @@ import Hull from "hull";
 
 import AppMiddleware from "../lib/middleware/app";
 
-export default class QueueApp {
+export default class WorkerApp {
   constructor({ queueAdapter, hostSecret }) {
     this.hostSecret = hostSecret;
     this.queueAdapter = queueAdapter;
@@ -17,6 +17,7 @@ export default class QueueApp {
   }
 
   process() {
+    // FIXME: move queue name to dependencies
     this.queueAdapter.process("queueApp", (job) => {
       return this.dispatch(job.data.name, job.data.context, job.data.payload);
     });

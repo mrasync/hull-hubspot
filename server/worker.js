@@ -1,18 +1,18 @@
 import Hull from "hull";
 
-import QueueApp from "./app/queue-app";
-import QueueRouter from "./router/queue-router";
+import WorkerApp from "./app/worker-app";
+import WorkerRouter from "./router/worker-router";
 import bootstrap from "./bootstrap";
 
 const { queueAdapter, controllers } = bootstrap;
 
 const hostSecret = process.env.SECRET || "1234";
 
-new QueueApp({ queueAdapter, hostSecret })
-  .use(QueueRouter(controllers))
+new WorkerApp({ queueAdapter, hostSecret })
+  .use(WorkerRouter(controllers))
   .process();
 
-Hull.logger.info("queueApp.process");
+Hull.logger.info("workerApp.process");
 
 function exitNow() {
   console.warn("Exiting now !");
