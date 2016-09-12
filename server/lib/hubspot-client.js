@@ -43,6 +43,10 @@ export default class HubspotClient {
   }
 
   refreshAccessToken() {
+    if (!this.refreshToken) {
+      return Promise.reject(new Error("Refresh token is not set."));
+    }
+
     return this.attach(this.req
       .post("/auth/v1/refresh"))
       .set("Content-Type", "application/x-www-form-urlencoded")

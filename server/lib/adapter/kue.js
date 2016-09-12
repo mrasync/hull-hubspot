@@ -21,10 +21,12 @@ export default class KueAdapter {
    */
   create(jobName, jobPayload, ttl = 0) {
     return Promise.fromCallback((callback) => {
-      return this.queue.create(jobName, jobPayload)
+      const job = this.queue.create(jobName, jobPayload)
         .ttl(ttl)
         .removeOnComplete(true)
-        .save(callback);
+        .save(function saveHandler(err) {
+          callback(err, job.id);
+        });
     });
   }
 
