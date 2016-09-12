@@ -13,6 +13,8 @@ export default class HubspotAgent {
   }
 
   checkToken() {
+    // FIXME: having `expires_in` property we can avoid making this additional
+    // API query
     return this.hubspotClient
       .get("/contacts/v1/lists/recently_updated/contacts/recent")
       .query({ count: 1 })

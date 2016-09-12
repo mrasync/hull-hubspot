@@ -45,6 +45,7 @@ export default function (deps) {
     },
     onAuthorize: (req, { hull, ship }) => {
       const { refreshToken, accessToken } = (req.account || {});
+      // FIXME: save `expires_in` property to ease token refresh
       return hull.put(ship.id, {
         private_settings: {
           ...ship.private_settings,
