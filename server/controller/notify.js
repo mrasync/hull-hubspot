@@ -9,7 +9,9 @@ export default class UserUpdateStrategy {
 
     const { user, changes = {}, segments = [] } = message;
 
-    if (_.get(changes, "user['traits_hubspot/fetched_at'][1]", false)) {
+    if (_.get(changes, "user['traits_hubspot/fetched_at'][1]", false)
+      && _.isEmpty(_.get(changes, "segments"))
+    ) {
       return Promise.resolve();
     }
 
@@ -48,7 +50,7 @@ export default class UserUpdateStrategy {
 
   segmentDeleteHandler(payload, { req }) {
     // TODO: if the segment would have `query` param we could trigger an extract
-    // for deleted segment
+    // for deleted segment, for now we need to trigger an extract for all userbase
     const segment = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup()
       .then(() => {
