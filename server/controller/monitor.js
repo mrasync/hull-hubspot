@@ -1,7 +1,11 @@
 export default class MonitorController {
 
   checkTokenAction(req, res) {
-    req.shipApp.hubspotAgent.checkToken();
-    res.end(status);
+    return req.shipApp.queueAgent.create("checkTokenJob")
+      .then((jobId) => res.end(`ok: ${jobId}`));
+  }
+
+  checkTokenJob(req) {
+    return req.shipApp.hubspotAgent.checkToken();
   }
 }

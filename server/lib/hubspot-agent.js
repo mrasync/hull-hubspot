@@ -1,5 +1,7 @@
 import moment from "moment";
 import Promise from "bluebird";
+import _ from "lodash";
+
 import ContactProperty from "./contact-property";
 
 export default class HubspotAgent {
@@ -13,6 +15,8 @@ export default class HubspotAgent {
   }
 
   checkToken() {
+    // TODO: having `expires_at` property we can avoid making this additional
+    // API query
     return this.hubspotClient
       .get("/contacts/v1/lists/recently_updated/contacts/recent")
       .query({ count: 1 })
@@ -22,8 +26,13 @@ export default class HubspotAgent {
       .catch((err) => {
         if (err.response.statusCode === 401) {
           return this.hubspotClient.refreshAccessToken()
+            .catch(err => {
+              this.hullClient.logger.error("Error in refreshAccessToken", err);
+              return Promise.reject(err);
+            })
             .then((res) => {
               return this.hullAgent.updateShipSettings({
+                expires_at: res.body.expires_at,
                 token: res.body.access_token
               });
             })
