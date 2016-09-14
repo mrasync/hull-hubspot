@@ -54,7 +54,7 @@ export default class UserUpdateStrategy {
     const segment = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup()
       .then(() => {
-        const segments = req.hull.ship.private_settings.synchronized_segments;
+        const segments = req.hull.ship.private_settings.synchronized_segments || [];
         if (segments.length === 0) {
           return req.shipApp.hullAgent.requestExtract({});
         }
