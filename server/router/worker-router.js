@@ -13,6 +13,7 @@ export default function (deps) {
     workerApp.attach("saveContactsJob", usersController.saveContactsJob.bind(usersController));
     workerApp.attach("sendUsersJob", usersController.sendUsersJob.bind(usersController));
     workerApp.attach("syncJob", syncController.syncJob.bind(syncController));
+    workerApp.attach("startSyncJob", syncController.startSyncJob.bind(syncController));
     workerApp.attach("checkTokenJob", monitorController.checkTokenJob.bind(monitorController));
     return workerApp;
   };
