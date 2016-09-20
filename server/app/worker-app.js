@@ -9,7 +9,9 @@ export default class WorkerApp {
     this.hostSecret = hostSecret;
     this.queueAdapter = queueAdapter;
     this.handlers = {};
-    this.supply = new Supply();
+    this.supply = new Supply()
+      .use(Hull.Middleware({ hostSecret: this.hostSecret }))
+      .use(AppMiddleware(this.queueAdapter));
   }
 
   attach(jobName, worker) {
@@ -34,8 +36,6 @@ export default class WorkerApp {
 
     return Promise.fromCallback((callback) => {
       this.supply
-        .use(Hull.Middleware({ hostSecret: this.hostSecret }))
-        .use(AppMiddleware(this.queueAdapter))
         .each(req, res, callback);
     })
     .then(() => {
