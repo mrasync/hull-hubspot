@@ -5,12 +5,15 @@ import FetchAllController from "./controller/fetch-all";
 import SyncController from "./controller/sync";
 import NotifyController from "./controller/notify";
 
+import InstrumentationAgent from "./lib/instrumentation-agent";
 import KueAdapter from "./lib/adapter/kue";
 
 const queueAdapter = new KueAdapter(({
   prefix: process.env.KUE_PREFIX || "hull-hubspot",
   redis: process.env.REDIS_URL
 }));
+
+const instrumentationAgent = new InstrumentationAgent();
 
 const controllers = {
   batchController: new BatchController(),
@@ -21,4 +24,4 @@ const controllers = {
   syncController: new SyncController()
 };
 
-export default { queueAdapter, controllers };
+export default { queueAdapter, controllers, instrumentationAgent };

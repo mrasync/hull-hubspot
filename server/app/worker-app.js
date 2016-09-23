@@ -5,10 +5,11 @@ import Hull from "hull";
 import AppMiddleware from "../lib/middleware/app";
 
 export default class WorkerApp {
-  constructor({ queueAdapter, hostSecret }) {
+  constructor({ queueAdapter, hostSecret, instrumentationAgent }) {
     this.hostSecret = hostSecret;
     this.queueAdapter = queueAdapter;
     this.handlers = {};
+    this.instrumentationAgent = instrumentationAgent;
     this.supply = new Supply()
       .use(Hull.Middleware({ hostSecret: this.hostSecret }))
       .use(AppMiddleware(this.queueAdapter));
@@ -21,11 +22,14 @@ export default class WorkerApp {
   process() {
     // FIXME: move queue name to dependencies
     this.queueAdapter.process("queueApp", (job) => {
-      return this.dispatch(job.data.name, job.data.context, job.data.payload);
+      return this.dispatch(job);
     });
   }
 
-  dispatch(jobName, req, jobData) {
+  dispatch(job) {
+    const jobName = job.data.name;
+    const req = job.data.context;
+    const jobData = job.data.payload;
     console.log("dispatch", jobName);
     req.payload = jobData;
     const res = {};
@@ -33,13 +37,29 @@ export default class WorkerApp {
     if (!this.handlers[jobName]) {
       return Promise.reject(new Error(`No such job registered ${jobName}`));
     }
+    return Promise.fromCallback((callback) => {
+      this.instrumentationAgent.startTransaction(jobName, () => {
+        this.runMiddleware(req, res)
+          .then(() => {
+            return this.handlers[jobName].call(job, req, res);
+          })
+          .then((jobRes) => {
+            callback(null, jobRes);
+          }, (err) => {
+            this.instrumentationAgent.catchError(err, { job_id: job.id });
+            callback(err);
+          })
+          .finally(() => {
+            this.instrumentationAgent.endTransaction();
+          });
+      });
+    });
+  }
 
+  runMiddleware(req, res) {
     return Promise.fromCallback((callback) => {
       this.supply
         .each(req, res, callback);
-    })
-    .then(() => {
-      return this.handlers[jobName](req, res);
     });
   }
 
