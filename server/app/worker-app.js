@@ -1,6 +1,7 @@
 import Supply from "supply";
 import Promise from "bluebird";
 import Hull from "hull";
+import _ from "lodash";
 
 import AppMiddleware from "../lib/middleware/app";
 
@@ -46,7 +47,14 @@ export default class WorkerApp {
           .then((jobRes) => {
             callback(null, jobRes);
           }, (err) => {
-            this.instrumentationAgent.catchError(err, { job_id: job.id });
+            this.instrumentationAgent.catchError(err, {
+              job: {
+                id: job.id,
+                name: job.data.name
+              },
+              organization: _.get(job.data.context, "query.organization"),
+              ship: _.get(job.data.context, "query.ship")
+            });
             callback(err);
           })
           .finally(() => {
