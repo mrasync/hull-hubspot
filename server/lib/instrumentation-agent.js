@@ -7,6 +7,7 @@ export default class InstrumentationAgent {
     this.raven = null;
 
     if (process.env.NEW_RELIC_LICENSE_KEY) {
+      console.log("starting newrelic");
       this.nr = require("newrelic"); // eslint-disable-line global-require
     }
 
