@@ -18,8 +18,7 @@ export default class SyncStrategy {
           lastImportTime,
           count
         });
-      })
-      .then(() => res.end("ok"));
+      });
   }
 
   syncJob(req) {

@@ -4,11 +4,11 @@ import WorkerApp from "./app/worker-app";
 import WorkerRouter from "./router/worker-router";
 import bootstrap from "./bootstrap";
 
-const { queueAdapter, controllers } = bootstrap;
+const { queueAdapter, controllers, instrumentationAgent } = bootstrap;
 
 const hostSecret = process.env.SECRET || "1234";
 
-new WorkerApp({ queueAdapter, hostSecret })
+new WorkerApp({ queueAdapter, hostSecret, instrumentationAgent })
   .use(WorkerRouter(controllers))
   .process();
 
