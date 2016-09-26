@@ -31,9 +31,9 @@ export default class InstrumentationAgent {
     }
   }
 
-  catchError(err, extra = {}) {
+  catchError(err, extra = {}, tags = {}) {
     if (this.raven && err) {
-      this.raven.captureException(err, { extra });
+      this.raven.captureException(err, { extra, tags });
     }
   }
 }

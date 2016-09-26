@@ -48,10 +48,9 @@ export default class WorkerApp {
             callback(null, jobRes);
           }, (err) => {
             this.instrumentationAgent.catchError(err, {
-              job: {
-                id: job.id,
-                name: job.data.name
-              },
+              job_id: job.id
+            }, {
+              job_name: job.data.name,
               organization: _.get(job.data.context, "query.organization"),
               ship: _.get(job.data.context, "query.ship")
             });
