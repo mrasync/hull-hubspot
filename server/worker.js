@@ -1,8 +1,8 @@
 import Hull from "hull";
 
+import bootstrap from "./bootstrap";
 import WorkerApp from "./app/worker-app";
 import WorkerRouter from "./router/worker-router";
-import bootstrap from "./bootstrap";
 
 const { queueAdapter, controllers, instrumentationAgent } = bootstrap;
 

@@ -8,12 +8,12 @@ import NotifyController from "./controller/notify";
 import InstrumentationAgent from "./lib/instrumentation-agent";
 import KueAdapter from "./lib/adapter/kue";
 
+const instrumentationAgent = new InstrumentationAgent();
+
 const queueAdapter = new KueAdapter(({
   prefix: process.env.KUE_PREFIX || "hull-hubspot",
   redis: process.env.REDIS_URL
 }));
-
-const instrumentationAgent = new InstrumentationAgent();
 
 const controllers = {
   batchController: new BatchController(),

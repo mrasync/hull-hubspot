@@ -1,12 +1,12 @@
 import Hull from "hull";
 import raven from "raven";
 
+import bootstrap from "./bootstrap";
 import BatchSyncHandler from "./lib/batch-sync-handler";
 import WebApp from "./app/web-app";
 import WebAppRouter from "./router/web-app-router";
 import WebStaticRouter from "./router/web-static-router";
 import WebOauthRouter from "./router/web-oauth-router";
-import bootstrap from "./bootstrap";
 
 const { queueAdapter, controllers, instrumentationAgent } = bootstrap;
 
