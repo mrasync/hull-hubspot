@@ -5,17 +5,19 @@ import ContactProperty from "./contact-property";
 
 export default class HubspotAgent {
 
-  constructor(hullAgent, hullClient, mapping, hubspotClient) {
+  constructor(hullAgent, hullClient, mapping, hubspotClient, ship) {
     this.hullAgent = hullAgent;
     this.hullClient = hullClient;
     this.mapping = mapping;
     this.hubspotClient = hubspotClient;
+    this.ship = ship;
     this.contactProperty = new ContactProperty();
   }
 
   checkToken() {
-    // TODO: having `expires_at` property we can avoid making this additional
-    // API query
+    // TODO: compare now with `expires_in` and `token_fetched_at` to avoid
+    // additional call to hubspot API:
+    // moment().isAfter(moment(token_fetched_at, "x").add(expires_in, "seconds").subtract(5, "minutes"))
     return this.hubspotClient
       .get("/contacts/v1/lists/recently_updated/contacts/recent")
       .query({ count: 1 })
@@ -31,7 +33,8 @@ export default class HubspotAgent {
             })
             .then((res) => {
               return this.hullAgent.updateShipSettings({
-                expires_at: res.body.expires_at,
+                expires_in: res.body.expires_in,
+                token_fetched_at: moment().utc().format("x"),
                 token: res.body.access_token
               });
             })

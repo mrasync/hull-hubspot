@@ -6,18 +6,14 @@ import _ from "lodash";
 import AppMiddleware from "../lib/middleware/app";
 
 export default class WorkerApp {
-  constructor({ queueAdapter, hostSecret, instrumentationAgent }) {
+  constructor({ queueAdapter, hostSecret, instrumentationAgent, shipCache }) {
     this.hostSecret = hostSecret;
     this.queueAdapter = queueAdapter;
     this.handlers = {};
     this.instrumentationAgent = instrumentationAgent;
     this.supply = new Supply()
-      // FIXME: the cached ship doesn't expire and won't be updated when
-      // access token changes as result of a "start over" operation in
-      // admin dashboard. The refresh token operation would update also the cached
-      // version with new data.
-      .use(Hull.Middleware({ hostSecret: this.hostSecret, cacheShip: false }))
-      .use(AppMiddleware(this.queueAdapter));
+      .use(Hull.Middleware({ hostSecret: this.hostSecret, shipCache }))
+      .use(AppMiddleware({ queueAdapter: this.queueAdapter, shipCache }));
   }
 
   attach(jobName, worker) {

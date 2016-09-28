@@ -14,7 +14,7 @@ export default class HubspotClient {
   attach(req) {
     if (!this.accessToken) {
       this.hullClient.logger.error("No access token set");
-      return Promise.reject();
+      return Promise.reject(new Error("No access token set"));
     }
 
     return req

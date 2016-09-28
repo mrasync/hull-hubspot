@@ -17,18 +17,19 @@ export default function (deps) {
     notifyController,
     syncController,
     hostSecret,
-    queueAdapter
+    queueAdapter,
+    shipCache
   } = deps;
 
   router
     .use("/notify", ParseMessageMiddleware)
     .use((req, res, next) => {
       if (req.query.ship || (req.hull && req.hull.token)) {
-        return Middleware({ hostSecret, fetchShip: true, cacheShip: true })(req, res, next);
+        return Middleware({ hostSecret, fetchShip: true, shipCache })(req, res, next);
       }
       return next();
     })
-    .use(AppMiddleware(queueAdapter));
+    .use(AppMiddleware({ queueAdapter, shipCache }));
 
   router.post("/batch", bodyParser.json(), batchController.handleBatchExtractAction.bind(batchController));
   router.post("/fetchAll", bodyParser.json(), fetchAllController.fetchAllAction.bind(fetchAllController));
@@ -42,7 +43,8 @@ export default function (deps) {
       "segment:delete": notifyController.segmentDeleteHandler.bind(notifyController),
       "user:update": notifyController.userUpdateHandler.bind(notifyController),
       "ship:update": notifyController.shipUpdateHandler.bind(notifyController),
-    }
+    },
+    shipCache
   }));
 
   router.post("/monitor/checkToken", bodyParser.json(), monitorController.checkTokenAction.bind(monitorController));
