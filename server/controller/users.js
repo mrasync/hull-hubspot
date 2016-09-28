@@ -19,7 +19,7 @@ export default class UsersController {
       req.hull.client.logger.warning("sendUsersJob works best for under 100 users at once", users.length);
     }
 
-    req.shipApp.hullAgent.getSegments()
+    return req.shipApp.hullAgent.getSegments()
       .then(segments => {
         const body = users.map((user) => {
           const properties = req.shipApp.mapping.getHubspotProperties(segments, user);
@@ -45,6 +45,9 @@ export default class UsersController {
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
         req.hull.client.logger.info("Hubspot batch error", _.get(err.response, "body"));
+        const error = new Error(_.get(err.response, "body.message"));
+        error.extra = _.get(err.response, "body");
+        return Promise.reject(error);
       });
   }
 

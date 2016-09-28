@@ -1,3 +1,4 @@
+/* eslint-disable */
 import MessageValidator from "sns-validator";
 import connect from "connect";
 import https from "https";

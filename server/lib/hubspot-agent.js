@@ -1,6 +1,5 @@
 import moment from "moment";
 import Promise from "bluebird";
-import _ from "lodash";
 
 import ContactProperty from "./contact-property";
 
@@ -26,9 +25,9 @@ export default class HubspotAgent {
       .catch((err) => {
         if (err.response.statusCode === 401) {
           return this.hubspotClient.refreshAccessToken()
-            .catch(err => {
-              this.hullClient.logger.error("Error in refreshAccessToken", err);
-              return Promise.reject(err);
+            .catch(refreshErr => {
+              this.hullClient.logger.error("Error in refreshAccessToken", refreshErr);
+              return Promise.reject(refreshErr);
             })
             .then((res) => {
               return this.hullAgent.updateShipSettings({

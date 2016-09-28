@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default function getMap() {
   return [
     { "name": "email",                                         "hull": "email",                                       "type": "string",  "title": "Email"                                   },
