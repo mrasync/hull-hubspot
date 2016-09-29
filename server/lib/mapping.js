@@ -43,7 +43,9 @@ export default class Mapping {
   }
 
   /**
-   * Maps Hull user data to Hubspot contact properties
+   * Maps Hull user data to Hubspot contact properties.
+   * It sends only the properties which are not read only - this is controlled
+   * by the mapping.
    * @see http://developers.hubspot.com/docs/methods/contacts/update_contact
    * @param  {Object} userData Hull user object
    * @return {Array}           Hubspot properties array
@@ -51,7 +53,7 @@ export default class Mapping {
   getHubspotProperties(segments, userData) {
     const contactProps = _.reduce(this.map, (props, prop) => {
       const value = _.get(userData, prop.hull) || _.get(userData, `traits_${prop.hull}`);
-      if (value) {
+      if (value && !prop.read_only) {
         props.push({
           property: prop.name,
           value
