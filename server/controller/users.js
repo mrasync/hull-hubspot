@@ -28,13 +28,7 @@ export default class UsersController {
             properties
           };
         });
-
-        return req.shipApp.hubspotClient.post("/contacts/v1/contact/batch/")
-          .query({
-            auditId: "Hull"
-          })
-          .set("Content-Type", "application/json")
-          .send(body);
+        return req.shipApp.hubspotAgent.batchUsers(body);
       })
       .then(res => {
         req.hull.client.logger.info("Hubspot batch statusCode", res.statusCode);

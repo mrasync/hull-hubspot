@@ -12,11 +12,6 @@ export default class HubspotClient {
   }
 
   attach(req) {
-    if (!this.accessToken) {
-      this.hullClient.logger.error("No access token set");
-      return Promise.reject(new Error("No access token set"));
-    }
-
     return req
       .use(prefixPlugin("https://api.hubapi.com"))
       .use(superagentPromisePlugin)
@@ -46,8 +41,7 @@ export default class HubspotClient {
       return Promise.reject(new Error("Refresh token is not set."));
     }
 
-    return this.attach(this.req
-      .post("/auth/v1/refresh"))
+    return this.attach(this.req.post("/auth/v1/refresh"))
       .set("Content-Type", "application/x-www-form-urlencoded")
       .send({
         refresh_token: this.refreshToken,

@@ -1,6 +1,7 @@
 import moment from "moment";
 import Promise from "bluebird";
 import _ from "lodash";
+import promiseRetry from "promise-retry";
 
 import ContactProperty from "./contact-property";
 
@@ -17,6 +18,26 @@ export default class HubspotAgent {
 
   isConfigured() {
     return !_.isEmpty(this.ship.private_settings.token);
+  }
+
+  /**
+   * This is a wrapper which handles the access_token errors for hubspot queries
+   * and runs `checkToken` to make sure that our token didn't expire.
+   * Then it retries the query once.
+   * @param {Promise} promise
+   */
+  retryUnauthorized(promise) {
+    return promiseRetry(retry => {
+      return promise()
+        .catch(err => {
+          if (err.response.unauthorized) {
+            this.hullClient.logger.info("retrying query");
+            return this.checkToken()
+              .then(() => retry(err));
+          }
+          return Promise.reject(err);
+        });
+    }, { retries: 0 });
   }
 
   checkToken() {
@@ -75,13 +96,16 @@ export default class HubspotAgent {
 
     const properties = this.mapping.getHubspotPropertiesKeys();
 
-    return this.hubspotClient
-      .get("/contacts/v1/lists/all/contacts/all")
-      .query({
-        count,
-        vidOffset: offset,
-        property: properties
-      });
+    return this.retryUnauthorized(() => {
+      return this.hubspotClient
+        .get("/contacts/v1/lists/all/contacts/all")
+        .query({
+          count,
+          vidOffset: offset,
+          property: properties
+        });
+    });
+
   }
 
   /**
@@ -96,26 +120,30 @@ export default class HubspotAgent {
   */
   getRecentContacts(lastImportTime, count = 100, offset = 0) {
     const properties = this.mapping.getHubspotPropertiesKeys();
-    return this.hubspotClient
-      .get("/contacts/v1/lists/recently_updated/contacts/recent")
-      .query({
-        count,
-        vidOffset: offset,
-        property: properties
-      })
-      .then((res) => {
-        res.body.contacts = res.body.contacts.filter((c) => {
-          return moment(c.properties.lastmodifieddate.value, "x")
-            .isAfter(lastImportTime);
+    return this.retryUnauthorized(() => {
+      return this.hubspotClient
+        .get("/contacts/v1/lists/recently_updated/contacts/recent")
+        .query({
+          count,
+          vidOffset: offset,
+          property: properties
         });
-        return res;
+    })
+    .then((res) => {
+      res.body.contacts = res.body.contacts.filter((c) => {
+        return moment(c.properties.lastmodifieddate.value, "x")
+          .isAfter(lastImportTime);
       });
+      return res;
+    });
   }
 
   syncHullGroup() {
     return Promise.all([
       this.hullAgent.getSegments(),
-      this.hubspotClient.get("/contacts/v2/groups").query({ includeProperties: true })
+      this.retryUnauthorized(() => {
+        return this.hubspotClient.get("/contacts/v2/groups").query({ includeProperties: true });
+      })
     ]).then(([segments = [], res]) => {
       const hubspotGroups = res.body;
       const hullSegmentsProperty = this.contactProperty.getHullProperty(segments);
@@ -137,6 +165,17 @@ export default class HubspotAgent {
         return this.hubspotClient.post("/contacts/v2/properties")
           .send(hullSegmentsProperty);
       });
+    });
+  }
+
+  batchUsers(body) {
+    return this.retryUnauthorized(() => {
+      return this.hubspotClient.post("/contacts/v1/contact/batch/")
+        .query({
+          auditId: "Hull"
+        })
+        .set("Content-Type", "application/json")
+        .send(body);
     });
   }
 }

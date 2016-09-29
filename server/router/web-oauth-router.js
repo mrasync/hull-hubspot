@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Strategy as HubspotStrategy } from "passport-hubspot";
 import moment from "moment";
+import _ from "lodash";
 
 import AppMiddleware from "../lib/middleware/app";
 
@@ -37,7 +38,8 @@ export default function (deps) {
         // after a Hubspot resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
         AppMiddleware({ queueAdapter, shipCache })(req, {}, () => {});
-        req.shipApp.hubspotAgent.syncHullGroup();
+        req.shipApp.hubspotAgent.syncHullGroup()
+          .catch((err) => hull.logger.error("Error in creating segments property", _.get(err.response, "body")));
 
         return hull.get(ship.id).then(s => {
           return { settings: s.private_settings };
