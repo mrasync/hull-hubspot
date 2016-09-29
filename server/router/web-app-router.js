@@ -5,6 +5,7 @@ import { Middleware } from "hull";
 import NotifHandler from "../lib/hull/notif-handler";
 import ParseMessageMiddleware from "../lib/middleware/parse-message";
 import AppMiddleware from "../lib/middleware/app";
+import RequireConfiguration from "../lib/middleware/require-configuration";
 
 
 export default function (deps) {
@@ -31,23 +32,23 @@ export default function (deps) {
     })
     .use(AppMiddleware({ queueAdapter, shipCache }));
 
-  router.post("/batch", bodyParser.json(), batchController.handleBatchExtractAction.bind(batchController));
-  router.post("/fetchAll", bodyParser.json(), fetchAllController.fetchAllAction.bind(fetchAllController));
-  router.post("/sync", bodyParser.json(), syncController.syncAction.bind(syncController));
+  router.post("/batch", RequireConfiguration, bodyParser.json(), batchController.handleBatchExtractAction);
+  router.post("/fetchAll", RequireConfiguration, bodyParser.json(), fetchAllController.fetchAllAction);
+  router.post("/sync", RequireConfiguration, bodyParser.json(), syncController.syncAction);
 
-  router.post("/notify", NotifHandler(Hull, {
+  router.post("/notify", RequireConfiguration, NotifHandler(Hull, {
     hostSecret,
     groupTraits: false,
     handlers: {
-      "segment:update": notifyController.segmentUpdateHandler.bind(notifyController),
-      "segment:delete": notifyController.segmentDeleteHandler.bind(notifyController),
-      "user:update": notifyController.userUpdateHandler.bind(notifyController),
-      "ship:update": notifyController.shipUpdateHandler.bind(notifyController),
+      "segment:update": notifyController.segmentUpdateHandler,
+      "segment:delete": notifyController.segmentDeleteHandler,
+      "user:update": notifyController.userUpdateHandler,
+      "ship:update": notifyController.shipUpdateHandler,
     },
     shipCache
   }));
 
-  router.post("/monitor/checkToken", bodyParser.json(), monitorController.checkTokenAction.bind(monitorController));
+  router.post("/monitor/checkToken", RequireConfiguration, bodyParser.json(), monitorController.checkTokenAction);
 
   return router;
 }

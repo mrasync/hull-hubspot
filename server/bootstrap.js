@@ -19,9 +19,9 @@ const queueAdapter = new KueAdapter(({
 }));
 
 const cacheManager = CacheManager.caching({
-  store: 'memory',
+  store: "memory",
   max: process.env.SHIP_CACHE_MAX || 100,
-  ttl: process.env.SHIP_CACHE_TTL || 60/*seconds*/
+  ttl: process.env.SHIP_CACHE_TTL || 60
 });
 
 const shipCache = new ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-hubspot");

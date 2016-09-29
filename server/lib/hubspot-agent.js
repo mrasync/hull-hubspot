@@ -1,5 +1,6 @@
 import moment from "moment";
 import Promise from "bluebird";
+import _ from "lodash";
 
 import ContactProperty from "./contact-property";
 
@@ -12,6 +13,10 @@ export default class HubspotAgent {
     this.hubspotClient = hubspotClient;
     this.ship = ship;
     this.contactProperty = new ContactProperty();
+  }
+
+  isConfigured() {
+    return !_.isEmpty(this.ship.private_settings.token);
   }
 
   checkToken() {
