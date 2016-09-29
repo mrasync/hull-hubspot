@@ -15,35 +15,43 @@ export default class HubspotAgent {
   }
 
   checkToken() {
-    // TODO: compare now with `expires_in` and `token_fetched_at` to avoid
-    // additional call to hubspot API:
-    // moment().isAfter(moment(token_fetched_at, "x").add(expires_in, "seconds").subtract(5, "minutes"))
-    return this.hubspotClient
-      .get("/contacts/v1/lists/recently_updated/contacts/recent")
-      .query({ count: 1 })
-      .then(() => {
-        return "valid";
-      })
-      .catch((err) => {
-        if (err.response.statusCode === 401) {
-          return this.hubspotClient.refreshAccessToken()
-            .catch(refreshErr => {
-              this.hullClient.logger.error("Error in refreshAccessToken", refreshErr);
-              return Promise.reject(refreshErr);
-            })
-            .then((res) => {
-              return this.hullAgent.updateShipSettings({
-                expires_in: res.body.expires_in,
-                token_fetched_at: moment().utc().format("x"),
-                token: res.body.access_token
-              });
-            })
-            .then(() => {
-              return "refreshed";
-            });
-        }
-        return Promise.reject(err);
-      });
+    const { token_fetched_at, expires_in } = this.ship.private_settings;
+    if (!token_fetched_at || !expires_in) {
+      const err = new Error("checkToken: Ship private settings lack token information");
+      err.private_settings = this.ship.private_settings;
+      this.hullClient.logger.error("Error in checkToken", err);
+      return Promise.reject(err);
+    }
+
+    const expiresAt = moment(token_fetched_at, "x").add(expires_in, "seconds");
+    const willExpireIn = expiresAt.diff(moment(), "seconds");
+    const willExpireSoon = willExpireIn <= (process.env.HUBSPOT_TOKEN_REFRESH_ADVANCE || 600); // 10 minutes
+    this.hullClient.logger.info("access_token", {
+      fetched_at: moment(token_fetched_at, "x").format(),
+      expires_in,
+      expires_at: expiresAt.format(),
+      will_expire_in: willExpireIn,
+      utc_now: moment().format(),
+      will_expire_soon: willExpireSoon
+    });
+    if (willExpireSoon) {
+      return this.hubspotClient.refreshAccessToken()
+        .catch(refreshErr => {
+          this.hullClient.logger.error("Error in refreshAccessToken", refreshErr);
+          return Promise.reject(refreshErr);
+        })
+        .then((res) => {
+          return this.hullAgent.updateShipSettings({
+            expires_in: res.body.expires_in,
+            token_fetched_at: moment().utc().format("x"),
+            token: res.body.access_token
+          });
+        })
+        .then(() => {
+          return "refreshed";
+        });
+    }
+    return Promise.resolve("valid");
   }
 
   /**
