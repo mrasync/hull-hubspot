@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { Strategy as HubspotStrategy } from "passport-hubspot";
 import moment from "moment";
-import _ from "lodash";
 
 import AppMiddleware from "../lib/middleware/app";
 
@@ -39,7 +38,7 @@ export default function (deps) {
         // subscription. Following two lines fixes that problem.
         AppMiddleware({ queueAdapter, shipCache })(req, {}, () => {});
         req.shipApp.hubspotAgent.syncHullGroup()
-          .catch((err) => hull.logger.error("Error in creating segments property", _.get(err.response, "body")));
+          .catch((err) => hull.logger.error("Error in creating segments property", err));
 
         return hull.get(ship.id).then(s => {
           return { settings: s.private_settings };
@@ -62,7 +61,6 @@ export default function (deps) {
     },
     onAuthorize: (req, { hull, ship }) => {
       const { refreshToken, accessToken, expiresIn } = (req.account || {});
-      // TODO: save `expires_at` property to ease token refresh
       const newShip = {
         private_settings: {
           ...ship.private_settings,

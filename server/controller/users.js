@@ -1,5 +1,4 @@
 import Promise from "bluebird";
-import _ from "lodash";
 
 export default class UsersController {
   /**
@@ -38,10 +37,8 @@ export default class UsersController {
         }
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
-        req.hull.client.logger.info("Hubspot batch error", _.get(err.response, "body"));
-        const error = new Error(_.get(err.response, "body.message"));
-        error.extra = _.get(err.response, "body");
-        return Promise.reject(error);
+        req.hull.client.logger.info("Hubspot batch error", err);
+        return Promise.reject(err);
       });
   }
 

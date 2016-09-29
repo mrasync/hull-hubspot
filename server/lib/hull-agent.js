@@ -22,9 +22,13 @@ export default class HullAgent {
   }
 
   updateShipSettings(newSettings) {
-    const private_settings = { ...this.ship.private_settings, ...newSettings };
-    this.ship.private_settings = private_settings;
-    return this.hullClient.put(this.ship.id, { private_settings })
+    this.hullClient.get(this.ship.id)
+      .then(ship => {
+        this.ship = ship;
+        const private_settings = { ...this.ship.private_settings, ...newSettings };
+        this.ship.private_settings = private_settings;
+        return this.hullClient.put(this.ship.id, { private_settings });
+      })
       .then(() => {
         return this.shipCache.del(this.ship.id);
       });

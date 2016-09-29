@@ -20,7 +20,7 @@ export default function ({ queueAdapter, shipCache }) {
     req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping, req.query, req.hostname, shipCache);
     req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient, req.hull.ship);
     req.shipApp.queueAgent = new QueueAgent(queueAdapter, req);
-    req.shipApp.progressAgent = new ProgressAgent(req.hull.ship, req.hull.client);
+    req.shipApp.progressAgent = new ProgressAgent(req.shipApp.hullAgent, req.hull.client);
     req.shipApp.shipCache = shipCache;
 
     return next();
