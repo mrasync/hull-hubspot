@@ -5,7 +5,7 @@ import HubspotAgent from "../hubspot-agent";
 import QueueAgent from "../queue-agent";
 import ProgressAgent from "../progress-agent";
 
-export default function (queueAdapter) {
+export default function ({ queueAdapter, shipCache, instrumentationAgent }) {
   return function middleware(req, res, next) {
     req.shipApp = req.shipApp || {};
 
@@ -13,14 +13,14 @@ export default function (queueAdapter) {
       return next();
     }
 
-    const accessToken = req.hull.ship.private_settings.token;
-    const refreshToken = req.hull.ship.private_settings.refresh_token;
-    req.shipApp.hubspotClient = new HubspotClient({ accessToken, refreshToken, hullClient: req.hull.client });
+    req.shipApp.hubspotClient = new HubspotClient({ ship: req.hull.ship, hullClient: req.hull.client, instrumentationAgent });
     req.shipApp.mapping = new Mapping(req.hull.ship);
-    req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping, req.query, req.hostname);
-    req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient);
+    req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping, req.query, req.hostname, shipCache);
+    req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient, req.hull.ship, instrumentationAgent);
     req.shipApp.queueAgent = new QueueAgent(queueAdapter, req);
-    req.shipApp.progressAgent = new ProgressAgent(req.hull.ship, req.hull.client);
+    req.shipApp.progressAgent = new ProgressAgent(req.shipApp.hullAgent, req.hull.client);
+    req.shipApp.shipCache = shipCache;
+    req.shipApp.instrumentationAgent = instrumentationAgent;
 
     return next();
   };

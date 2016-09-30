@@ -8,12 +8,13 @@ import request from "request";
 import URI from "urijs";
 
 export default class HullAgent {
-  constructor(ship, hullClient, mapping, query, hostname) {
+  constructor(ship, hullClient, mapping, query, hostname, shipCache) {
     this.ship = ship;
     this.hullClient = hullClient;
     this.mapping = mapping;
     this.query = query;
     this.hostname = hostname;
+    this.shipCache = shipCache;
   }
 
   getSegments() {
@@ -21,9 +22,19 @@ export default class HullAgent {
   }
 
   updateShipSettings(newSettings) {
-    return this.hullClient.put(this.ship.id, {
-      private_settings: { ...this.ship.private_settings, ...newSettings }
-    });
+    this.hullClient.get(this.ship.id)
+      .then(ship => {
+        this.ship = ship;
+        const private_settings = { ...this.ship.private_settings, ...newSettings };
+        this.ship.private_settings = private_settings;
+        return this.hullClient.put(this.ship.id, { private_settings });
+      })
+      .then((ship) => {
+        return this.shipCache.del(this.ship.id)
+          .then(() => {
+            return ship;
+          });
+      });
   }
 
   /**

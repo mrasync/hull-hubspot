@@ -1,3 +1,6 @@
+import CacheManager from "cache-manager";
+import { ShipCache } from "hull";
+
 import BatchController from "./controller/batch";
 import MonitorController from "./controller/monitor";
 import UsersController from "./controller/users";
@@ -15,6 +18,14 @@ const queueAdapter = new KueAdapter(({
   redis: process.env.REDIS_URL
 }));
 
+const cacheManager = CacheManager.caching({
+  store: "memory",
+  max: process.env.SHIP_CACHE_MAX || 100,
+  ttl: process.env.SHIP_CACHE_TTL || 60
+});
+
+const shipCache = new ShipCache(cacheManager, process.env.SHIP_CACHE_PREFIX || "hull-hubspot");
+
 const controllers = {
   batchController: new BatchController(),
   monitorController: new MonitorController(),
@@ -24,4 +35,4 @@ const controllers = {
   syncController: new SyncController()
 };
 
-export default { queueAdapter, controllers, instrumentationAgent };
+export default { queueAdapter, controllers, instrumentationAgent, shipCache };

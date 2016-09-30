@@ -14,10 +14,12 @@
       "value": "info"
     },
     "LOGSTASH_PORT" : {
-      "description" : "Logstash Port"
+      "description" : "Logstash Port",
+      "required": false
     },
     "LOGSTASH_HOST" : {
-      "description" : "Logstash Host"
+      "description" : "Logstash Host",
+      "required": false
     },
     "CLIENT_ID" : {
       "description" : "oAuth Client ID",
@@ -28,5 +30,15 @@
       "required": true
     }
   },
-  "scripts": {}
+  "scripts": {},
+  "addons": [
+    {
+      "plan": "heroku-redis:hobby-dev",
+      "as": "REDIS"
+    },
+    {
+      "plan": "logentries:le_tryit",
+      "as": "LOGENTRIES"
+    }
+  ]
 }

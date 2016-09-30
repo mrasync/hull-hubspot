@@ -1,5 +1,4 @@
 import Promise from "bluebird";
-import _ from "lodash";
 
 export default class UsersController {
   /**
@@ -28,15 +27,13 @@ export default class UsersController {
             properties
           };
         });
-
-        return req.shipApp.hubspotClient.post("/contacts/v1/contact/batch/")
-          .query({
-            auditId: "Hull"
-          })
-          .set("Content-Type", "application/json")
-          .send(body);
+        req.shipApp.instrumentationAgent.metricVal("send_users", body.length, req.hull.ship);
+        return req.shipApp.hubspotAgent.batchUsers(body);
       })
       .then(res => {
+        if (res === null) {
+          return Promise.resolve();
+        }
         req.hull.client.logger.info("Hubspot batch statusCode", res.statusCode);
 
         if (res.statusCode === 202) {
@@ -44,10 +41,8 @@ export default class UsersController {
         }
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
-        req.hull.client.logger.info("Hubspot batch error", _.get(err.response, "body"));
-        const error = new Error(_.get(err.response, "body.message"));
-        error.extra = _.get(err.response, "body");
-        return Promise.reject(error);
+        req.hull.client.logger.info("Hubspot batch error", err);
+        return Promise.reject(err);
       });
   }
 
@@ -59,6 +54,7 @@ export default class UsersController {
    */
   saveContactsJob(req) {
     const contacts = req.payload.contacts;
+    req.shipApp.instrumentationAgent.metricVal("save_contact", contacts.length, req.hull.ship);
     return req.shipApp.hullAgent.saveContacts(contacts);
   }
 }
