@@ -4,18 +4,19 @@ import prefixPlugin from "superagent-prefix";
 import superagentPromisePlugin from "superagent-promise-plugin";
 
 export default class HubspotClient {
-  constructor({ accessToken, refreshToken, hullClient }) {
+  constructor({ ship, hullClient }) {
+    this.ship = ship;
     this.hullClient = hullClient;
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
+
     this.req = request;
   }
 
   attach(req) {
+    const accessToken = this.ship.private_settings.token;
     return req
       .use(prefixPlugin("https://api.hubapi.com"))
       .use(superagentPromisePlugin)
-      .query({ access_token: this.accessToken })
+      .query({ access_token: accessToken })
       .on("request", (reqData) => {
         this.hullClient.logger.info("hubspotClient.req", reqData.url);
       });
@@ -37,14 +38,15 @@ export default class HubspotClient {
   }
 
   refreshAccessToken() {
-    if (!this.refreshToken) {
+    const refreshToken = this.ship.private_settings.refresh_token;
+    if (!refreshToken) {
       return Promise.reject(new Error("Refresh token is not set."));
     }
 
     return this.attach(this.req.post("/auth/v1/refresh"))
       .set("Content-Type", "application/x-www-form-urlencoded")
       .send({
-        refresh_token: this.refreshToken,
+        refresh_token: refreshToken,
         client_id: process.env.CLIENT_ID,
         grant_type: "refresh_token"
       });

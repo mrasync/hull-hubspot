@@ -29,8 +29,11 @@ export default class HullAgent {
         this.ship.private_settings = private_settings;
         return this.hullClient.put(this.ship.id, { private_settings });
       })
-      .then(() => {
-        return this.shipCache.del(this.ship.id);
+      .then((ship) => {
+        return this.shipCache.del(this.ship.id)
+          .then(() => {
+            return ship;
+          });
       });
   }
 

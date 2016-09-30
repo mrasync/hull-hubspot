@@ -31,8 +31,12 @@ export default class HubspotAgent {
       return promise()
         .catch(err => {
           if (err.response.unauthorized) {
-            this.hullClient.logger.info("retrying query");
-            return this.checkToken()
+            this.hullClient.logger.info("retrying query", _.get(err, "response.body"));
+            return this.checkToken({ force: true })
+              .then(() => {
+                this.hubspotClient.ship = this.ship;
+                return true;
+              })
               .then(() => retry(err));
           }
           return Promise.reject(err);
@@ -45,7 +49,7 @@ export default class HubspotAgent {
     });
   }
 
-  checkToken() {
+  checkToken({ force = false }) {
     const { token_fetched_at, expires_in } = this.ship.private_settings;
     if (!token_fetched_at || !expires_in) {
       const err = new Error("checkToken: Ship private settings lack token information");
@@ -65,7 +69,7 @@ export default class HubspotAgent {
       utc_now: moment().format(),
       will_expire_soon: willExpireSoon
     });
-    if (willExpireSoon) {
+    if (willExpireSoon || force) {
       return this.hubspotClient.refreshAccessToken()
         .catch(refreshErr => {
           this.hullClient.logger.error("Error in refreshAccessToken", refreshErr);
@@ -78,7 +82,8 @@ export default class HubspotAgent {
             token: res.body.access_token
           });
         })
-        .then(() => {
+        .then((ship) => {
+          this.ship = ship;
           return "refreshed";
         });
     }

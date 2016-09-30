@@ -13,9 +13,7 @@ export default function ({ queueAdapter, shipCache }) {
       return next();
     }
 
-    const accessToken = req.hull.ship.private_settings.token;
-    const refreshToken = req.hull.ship.private_settings.refresh_token;
-    req.shipApp.hubspotClient = new HubspotClient({ accessToken, refreshToken, hullClient: req.hull.client });
+    req.shipApp.hubspotClient = new HubspotClient({ ship: req.hull.ship, hullClient: req.hull.client });
     req.shipApp.mapping = new Mapping(req.hull.ship);
     req.shipApp.hullAgent = new HullAgent(req.hull.ship, req.hull.client, req.shipApp.mapping, req.query, req.hostname, shipCache);
     req.shipApp.hubspotAgent = new HubspotAgent(req.shipApp.hullAgent, req.hull.client, req.shipApp.mapping, req.shipApp.hubspotClient, req.hull.ship);
