@@ -53,10 +53,9 @@ export default class HubspotAgent {
   checkToken({ force = false } = {}) {
     const { token_fetched_at, expires_in } = this.ship.private_settings;
     if (!token_fetched_at || !expires_in) {
-      const err = new Error("checkToken: Ship private settings lack token information");
-      err.private_settings = this.ship.private_settings;
-      this.hullClient.logger.error("Error in checkToken", err);
-      return Promise.reject(err);
+      this.hullClient.logger.error("checkToken: Ship private settings lack token information");
+      token_fetched_at = moment().utc().format("x");
+      expires_in = 0;
     }
 
     const expiresAt = moment(token_fetched_at, "x").add(expires_in, "seconds");
