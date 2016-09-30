@@ -174,6 +174,11 @@ export default class HubspotAgent {
         return this.hubspotClient.post("/contacts/v2/properties")
           .send(hullSegmentsProperty);
       });
+    })
+    .catch(err => {
+      const simplifiedErr = new Error(_.get(err.response, "body.message"));
+      simplifiedErr.extra = _.get(err.response, "body");
+      return Promise.reject(simplifiedErr);
     });
   }
 
