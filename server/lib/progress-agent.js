@@ -14,15 +14,10 @@ export default class ProgressAgent {
     });
   }
 
-  update(newProgress) {
+  update(newProgress, hasMore = false) {
     return this.hullAgent.updateShipSettings({
-      fetch_count: newProgress
-    });
-  }
-
-  finish() {
-    return this.hullAgent.updateShipSettings({
-      is_fetch_completed: true
+      fetch_count: newProgress,
+      is_fetch_completed: hasMore
     });
   }
 }

@@ -33,7 +33,7 @@ export default class FetchAllController {
       .then((data) => {
         const promises = [];
         const newProgress = progress + data.body.contacts.length;
-        req.shipApp.progressAgent.update(newProgress);
+        req.shipApp.progressAgent.update(newProgress, data.body["has-more"]);
         if (data.body["has-more"]) {
           promises.push(req.shipApp.queueAgent.create("fetchAllJob", {
             count,
@@ -42,7 +42,6 @@ export default class FetchAllController {
           }));
         } else {
           req.hull.client.logger.info("fetchAllJob.finished");
-          req.shipApp.progressAgent.finish();
         }
 
         if (data.body.contacts.length > 0) {
