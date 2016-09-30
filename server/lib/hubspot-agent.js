@@ -178,6 +178,9 @@ export default class HubspotAgent {
   }
 
   batchUsers(body) {
+    if (_.isEmpty(body)) {
+      return Promise.resolve();
+    }
     return this.retryUnauthorized(() => {
       return this.hubspotClient.post("/contacts/v1/contact/batch/")
         .query({
