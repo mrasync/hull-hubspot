@@ -6,6 +6,10 @@ import BatchSyncHandler from "../lib/batch-sync-handler";
 export default class UserUpdateStrategy {
   userUpdateHandler(payload, { req }) {
     const message = payload.message;
+    if (!req.shipApp.hubspotAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
 
     const { user, changes = {}, segments = [] } = message;
 
@@ -35,12 +39,20 @@ export default class UserUpdateStrategy {
   }
 
   shipUpdateHandler(payload, { req }) {
+    if (!req.shipApp.hubspotAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
     const message = payload.message; // eslint-disable-line no-unused-vars
     return req.shipApp.hubspotAgent.syncHullGroup()
       .catch((err) => req.hull.client.logger.error("Error in creating segments property", err));
   }
 
   segmentUpdateHandler(payload, { req }) {
+    if (!req.shipApp.hubspotAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
     const segment = payload.message;
     return req.shipApp.hubspotAgent.syncHullGroup()
       .then(() => {
@@ -49,6 +61,10 @@ export default class UserUpdateStrategy {
   }
 
   segmentDeleteHandler(payload, { req }) {
+    if (!req.shipApp.hubspotAgent.isConfigured()) {
+      req.hull.client.logger.info("ship is not configured");
+      return Promise.resolve();
+    }
     // TODO: if the segment would have `query` param we could trigger an extract
     // for deleted segment, for now we need to trigger an extract for all userbase
     const segment = payload.message; // eslint-disable-line no-unused-vars

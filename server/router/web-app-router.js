@@ -36,7 +36,7 @@ export default function (deps) {
   router.post("/fetchAll", RequireConfiguration, bodyParser.json(), fetchAllController.fetchAllAction);
   router.post("/sync", RequireConfiguration, bodyParser.json(), syncController.syncAction);
 
-  router.post("/notify", RequireConfiguration, NotifHandler(Hull, {
+  router.post("/notify", NotifHandler(Hull, {
     hostSecret,
     groupTraits: false,
     handlers: {
