@@ -13,7 +13,8 @@ export default function (deps) {
     clientID,
     clientSecret,
     queueAdapter,
-    shipCache
+    shipCache,
+    instrumentationAgent
   } = deps;
 
   const { OAuthHandler } = Hull;
@@ -36,7 +37,7 @@ export default function (deps) {
         // TODO: we have notices problems with syncing hull segments property
         // after a Hubspot resync, there may be a problem with notification
         // subscription. Following two lines fixes that problem.
-        AppMiddleware({ queueAdapter, shipCache })(req, {}, () => {});
+        AppMiddleware({ queueAdapter, shipCache, instrumentationAgent })(req, {}, () => {});
         req.shipApp.hubspotAgent.syncHullGroup()
           .catch((err) => hull.logger.error("Error in creating segments property", err));
 

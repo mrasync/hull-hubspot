@@ -13,7 +13,7 @@ export default class WorkerApp {
     this.instrumentationAgent = instrumentationAgent;
     this.supply = new Supply()
       .use(Hull.Middleware({ hostSecret: this.hostSecret, shipCache }))
-      .use(AppMiddleware({ queueAdapter: this.queueAdapter, shipCache }));
+      .use(AppMiddleware({ queueAdapter: this.queueAdapter, shipCache, instrumentationAgent }));
   }
 
   attach(jobName, worker) {
@@ -42,11 +42,13 @@ export default class WorkerApp {
       this.instrumentationAgent.startTransaction(jobName, () => {
         this.runMiddleware(req, res)
           .then(() => {
+            this.instrumentationAgent.metricInc("job.start", 1, req.hull.ship);
             return this.handlers[jobName].call(job, req, res);
           })
           .then((jobRes) => {
             callback(null, jobRes);
           }, (err) => {
+            this.instrumentationAgent.metricInc("job.error", 1, req.hull.ship);
             this.instrumentationAgent.catchError(err, {
               job_id: job.id
             }, {

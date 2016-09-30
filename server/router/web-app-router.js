@@ -19,7 +19,8 @@ export default function (deps) {
     syncController,
     hostSecret,
     queueAdapter,
-    shipCache
+    shipCache,
+    instrumentationAgent
   } = deps;
 
   router
@@ -30,7 +31,7 @@ export default function (deps) {
       }
       return next();
     })
-    .use(AppMiddleware({ queueAdapter, shipCache }));
+    .use(AppMiddleware({ queueAdapter, shipCache, instrumentationAgent }));
 
   router.post("/batch", RequireConfiguration, bodyParser.json(), batchController.handleBatchExtractAction);
   router.post("/fetchAll", RequireConfiguration, bodyParser.json(), fetchAllController.fetchAllAction);

@@ -52,6 +52,8 @@ export default class Mapping {
    */
   getHubspotProperties(segments, userData) {
     const contactProps = _.reduce(this.map, (props, prop) => {
+      // TODO: the upstream update of hubspot properties except hull segments is disabled:
+      return []; // eslint-disable-next-line no-unreachable
       const value = _.get(userData, prop.hull) || _.get(userData, `traits_${prop.hull}`);
       if (value && !prop.read_only) {
         props.push({

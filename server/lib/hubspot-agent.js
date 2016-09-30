@@ -7,13 +7,14 @@ import ContactProperty from "./contact-property";
 
 export default class HubspotAgent {
 
-  constructor(hullAgent, hullClient, mapping, hubspotClient, ship) {
+  constructor(hullAgent, hullClient, mapping, hubspotClient, ship, instrumentationAgent) {
     this.hullAgent = hullAgent;
     this.hullClient = hullClient;
     this.mapping = mapping;
     this.hubspotClient = hubspotClient;
     this.ship = ship;
     this.contactProperty = new ContactProperty();
+    this.instrumentationAgent = instrumentationAgent;
   }
 
   isConfigured() {
