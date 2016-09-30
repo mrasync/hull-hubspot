@@ -176,8 +176,8 @@ export default class HubspotAgent {
       });
     })
     .catch(err => {
-      const simplifiedErr = new Error(_.get(err.response, "body.message"));
-      simplifiedErr.extra = _.get(err.response, "body");
+      const simplifiedErr = new Error(_.get(err, "response.body.message"));
+      simplifiedErr.extra = _.get(err, "response.body");
       return Promise.reject(simplifiedErr);
     });
   }
