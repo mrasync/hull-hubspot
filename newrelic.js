@@ -21,5 +21,6 @@ exports.config = {
      * production applications.
      */
     level: "info"
-  }
+  },
+  agent_enabled: !!process.env.NEW_RELIC_LICENSE_KEY,
 };
