@@ -28,5 +28,11 @@
       "required": true
     }
   },
-  "scripts": {}
+  "scripts": {},
+  "addons": [
+    {
+      "plan": "heroku-redis:hobby-dev",
+      "as": "REDIS"
+    }
+  ]
 }
