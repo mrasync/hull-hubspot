@@ -35,6 +35,10 @@
     {
       "plan": "heroku-redis:hobby-dev",
       "as": "REDIS"
+    },
+    {
+      "plan": "logentries:le_tryit",
+      "as": "LOGENTRIES"
     }
   ]
 }
