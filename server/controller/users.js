@@ -30,6 +30,9 @@ export default class UsersController {
         return req.shipApp.hubspotAgent.batchUsers(body);
       })
       .then(res => {
+        if (res === null) {
+          return Promise.resolve();
+        }
         req.hull.client.logger.info("Hubspot batch statusCode", res.statusCode);
 
         if (res.statusCode === 202) {

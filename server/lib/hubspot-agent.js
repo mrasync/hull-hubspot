@@ -49,7 +49,7 @@ export default class HubspotAgent {
     });
   }
 
-  checkToken({ force = false }) {
+  checkToken({ force = false } = {}) {
     const { token_fetched_at, expires_in } = this.ship.private_settings;
     if (!token_fetched_at || !expires_in) {
       const err = new Error("checkToken: Ship private settings lack token information");
@@ -179,7 +179,7 @@ export default class HubspotAgent {
 
   batchUsers(body) {
     if (_.isEmpty(body)) {
-      return Promise.resolve();
+      return Promise.resolve(null);
     }
     return this.retryUnauthorized(() => {
       return this.hubspotClient.post("/contacts/v1/contact/batch/")
