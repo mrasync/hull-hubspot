@@ -50,6 +50,28 @@
       "type": "boolean",
       "default": false,
       "format": "hidden"
+    },
+    {
+      "name": "additional_sync_fields",
+      "title": "Custom Fields Sync (Hubspot to Hull)",
+      "type": "array",
+      "format": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Hubspot Field ID",
+            "type": "string",
+            "format": "string"
+          },
+          "hull": {
+            "title": "Hull Field ID",
+            "type": "string",
+            "format": "trait",
+            "pattern": "^[0-9a-zA-Z_]+$"
+          }
+        }
+      }
     }
   ],
   "deployment_settings": [],
@@ -65,7 +87,7 @@
     {
       "url": "/sync",
       "type": "cron",
-      "value": "*/5 * * * *"
+      "value": "0 * * * *"
     },
     {
       "url": "/monitor/checkToken",
