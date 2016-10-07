@@ -68,7 +68,12 @@
             "title": "Hull Field ID",
             "type": "string",
             "format": "trait",
-            "pattern": "^[0-9a-zA-Z_]+$"
+            "pattern": "^[0-9a-zA-Z_]+$",
+            "options": {
+              "source": "hubspot",
+              "placeholder": "Enter a Hull field id",
+              "allowCreate": true
+            }
           }
         }
       }
