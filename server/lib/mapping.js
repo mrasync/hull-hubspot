@@ -4,7 +4,7 @@ import getMap from "./mapping-data";
 export default class Mapping {
   constructor(ship) {
     this.ship = ship;
-    this.map = getMap();
+    this.map = getMap(ship);
   }
 
   /**
@@ -33,7 +33,11 @@ export default class Mapping {
    */
   getHullTraits(userData) {
     const hullTraits = _.reduce(this.map, (traits, prop) => {
-      traits[prop.hull] = _.get(userData, `properties[${prop.name}].value`);
+      let val = _.get(userData, `properties[${prop.name}].value`);
+      if (prop.type === "number") {
+        val = parseFloat(val);
+      }
+      traits[prop.hull] = val;
       return traits;
     }, {});
 
