@@ -10,8 +10,10 @@ export default class KueAdapter {
    * @param {Object} queue Kue instance
    */
   constructor(options) {
+    this.options = options;
     this.queue = kue.createQueue(options);
     this.queue.watchStuckJobs();
+    this.app = kue.app;
   }
 
   /**

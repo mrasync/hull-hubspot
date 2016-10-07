@@ -7,6 +7,7 @@ import WebApp from "./app/web-app";
 import WebAppRouter from "./router/web-app-router";
 import WebStaticRouter from "./router/web-static-router";
 import WebOauthRouter from "./router/web-oauth-router";
+import WebKueRouter from "./router/web-kue-router";
 
 const { queueAdapter, controllers, instrumentationAgent, shipCache } = bootstrap;
 
@@ -21,9 +22,12 @@ if (instrumentationAgent.raven) {
   app.use(raven.middleware.express.requestHandler(instrumentationAgent.raven));
 }
 
+
+
 app.use("/", WebAppRouter({ ...controllers, Hull, hostSecret, queueAdapter, shipCache, instrumentationAgent }))
   .use("/", WebStaticRouter({ Hull }))
-  .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret, shipCache, instrumentationAgent }));
+  .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret, shipCache, instrumentationAgent }))
+  .use("/kue", WebKueRouter({ hostSecret, queueAdapter }))
 
 if (instrumentationAgent.raven) {
   app.use(raven.middleware.express.errorHandler(instrumentationAgent.raven));
