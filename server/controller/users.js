@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Promise from "bluebird";
 
 export default class UsersController {
@@ -12,10 +13,16 @@ export default class UsersController {
    * @return {Promise}
    */
   sendUsersJob(req) {
-    const users = req.payload.users;
-    req.hull.client.logger.log("sendUsersJob", users.length);
+    const users = (req.payload.users || []).filter(u => !_.isEmpty(u.email));
+
+    if (users.length === 0) {
+      return req.hull.client.logger.log("skip psendUsersJob - empty users list");
+    }
+
+    req.hull.client.logger.log("sendUsersJob", { count_users: users.length });
+
     if (users.length > 100) {
-      req.hull.client.logger.warning("sendUsersJob works best for under 100 users at once", users.length);
+      req.hull.client.logger.warn("sendUsersJob works best for under 100 users at once", users.length);
     }
 
     return req.shipApp.hullAgent.getSegments()
@@ -34,11 +41,14 @@ export default class UsersController {
         if (res === null) {
           return Promise.resolve();
         }
-        req.hull.client.logger.info("Hubspot batch statusCode", res.statusCode);
 
-        if (res.statusCode === 202) {
+        const { statusCode, body } = res;
+
+        if (statusCode === 202) {
           return Promise.resolve();
         }
+
+        console.warn("Error in sendUsersJob", { statusCode, body });
         return Promise.reject(new Error("Error in create/update batch"));
       }, (err) => {
         req.hull.client.logger.info("Hubspot batch error", err);

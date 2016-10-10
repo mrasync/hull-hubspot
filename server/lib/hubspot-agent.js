@@ -13,7 +13,6 @@ export default class HubspotAgent {
     this.mapping = mapping;
     this.hubspotClient = hubspotClient;
     this.ship = ship;
-    this.contactProperty = new ContactProperty();
     this.instrumentationAgent = instrumentationAgent;
   }
 
@@ -45,7 +44,7 @@ export default class HubspotAgent {
     }, { retries: 0 })
     .catch(err => {
       const simplifiedErr = new Error(_.get(err.response, "body.message"));
-      simplifiedErr.extra = _.get(err.response, "body");
+      simplifiedErr.extra = JSON.stringify(_.get(err.response, "body") || {});
       return Promise.reject(simplifiedErr);
     });
   }
@@ -147,40 +146,28 @@ export default class HubspotAgent {
     });
   }
 
-  syncHullGroup() {
+
+  /**
+   * makes sure hubspot is properly configured to receive custom properties and segments list
+   * @return {Promise}
+   */
+  syncContactProperties() {
+    const customProps = this.ship.private_settings.sync_fields_to_hubspot;
     return Promise.all([
       this.hullAgent.getSegments(),
       this.retryUnauthorized(() => {
         return this.hubspotClient.get("/contacts/v2/groups").query({ includeProperties: true });
-      })
-    ]).then(([segments = [], res]) => {
-      const hubspotGroups = res.body;
-      const hullSegmentsProperty = this.contactProperty.getHullProperty(segments);
-      const hullGroup = this.contactProperty.findHullGroup(hubspotGroups);
-
-      return (() => {
-        if (!hullGroup) {
-          return this.hubspotClient.post("/contacts/v2/groups")
-            .send(this.contactProperty.getHullGroup());
-        }
-        return Promise.resolve();
-      })()
-      .then(() => {
-        if (this.contactProperty.findHullProperty(hullGroup)) {
-          return this.hubspotClient
-            .put(`/contacts/v2/properties/named/${hullSegmentsProperty.name}`)
-            .send(hullSegmentsProperty);
-        }
-        return this.hubspotClient.post("/contacts/v2/properties")
-          .send(hullSegmentsProperty);
+      }),
+      this.hullAgent.getAvailableProperties()
+    ]).then(([ segments = [], groupsResponse = {}, hullProperties = {} ]) => {
+      const groups = (groupsResponse && groupsResponse.body) || [];
+      const properties = _.values(_.pick(hullProperties, customProps));
+      return ContactProperty.sync(this.hubspotClient, {
+        segments, groups, properties, logger: this.hullClient.logger
       });
     })
-    .catch(err => {
-      const simplifiedErr = new Error(_.get(err, "response.body.message"));
-      simplifiedErr.extra = _.get(err, "response.body");
-      return Promise.reject(simplifiedErr);
-    });
   }
+
 
   batchUsers(body) {
     if (_.isEmpty(body)) {
