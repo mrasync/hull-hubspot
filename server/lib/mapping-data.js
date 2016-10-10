@@ -51,14 +51,23 @@ const DEFAULT_MAPPING = [
   { "name": "hs_lifecyclestage_other_date",                  "hull": "hubspot/became_other_at",                     "type": "date",    "title": "Became an Other Lifecycle Date",          "read_only": false }
 ];
 
-export default function getMap(ship = {}) {
+export function getFieldsToHubspot(ship = {}) {
+  const fields = _.get(ship, "private_settings.sync_fields_to_hubspot") || [];
+  return fields.map(f => {
+    const hull = f.replace(/^traits_/, "");
+    const name = `hull_${hull.replace(/\//g, '_')}`;
+    return { name, hull };
+  });
+}
+
+export function getFieldsToHull(ship = {}) {
   const fields = DEFAULT_MAPPING.slice();
-  const addFields = _.get(ship, 'private_settings.additional_sync_fields');
+  const addFields = _.get(ship, 'private_settings.sync_fields_to_hull');
 
   if (addFields && addFields.length > 0) {
     addFields.map(({ name, hull }) => {
       if (name && hull) {
-        fields.push({ name, hull: hull.replace(/^traits_/, '') });
+        fields.push({ name, hull: hull.replace(/^traits_/, "") });
       }
     });
   }
@@ -66,3 +75,10 @@ export default function getMap(ship = {}) {
   return fields;
 }
 
+
+export function getMap(ship) {
+  return {
+    to_hull: getFieldsToHull(ship),
+    to_hubspot: getFieldsToHubspot(ship)
+  }
+}

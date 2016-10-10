@@ -1,5 +1,5 @@
 import _ from "lodash";
-import getMap from "./mapping-data";
+import { getMap } from "./mapping-data";
 
 export default class Mapping {
   constructor(ship) {
@@ -13,7 +13,7 @@ export default class Mapping {
    * @return {Array}
    */
   getHubspotPropertiesKeys() {
-    return this.map.map((prop) => prop.name);
+    return this.map.to_hull.map((prop) => prop.name);
   }
 
   /**
@@ -22,7 +22,7 @@ export default class Mapping {
    * @return {Array}
    */
   getHullTraitsKeys() {
-    return this.map.map((prop) => prop.hull);
+    return this.map.to_hubspot.map((prop) => prop.hull);
   }
 
 
@@ -32,12 +32,17 @@ export default class Mapping {
    * @return {Object}          Hull user traits
    */
   getHullTraits(userData) {
-    const hullTraits = _.reduce(this.map, (traits, prop) => {
-      let val = _.get(userData, `properties[${prop.name}].value`);
-      if (prop.type === "number") {
-        val = parseFloat(val);
+    const hullTraits = _.reduce(this.map.to_hull, (traits, prop) => {
+      if (userData.properties && userData.properties.hasOwnProperty(prop.name)) {
+        let val = _.get(userData, `properties[${prop.name}].value`);
+        if (prop.type === "number") {
+          const numVal = parseFloat(val);
+          if (!isNaN(val)) {
+            val = numVal;
+          }
+        }
+        traits[prop.hull] = val;
       }
-      traits[prop.hull] = val;
       return traits;
     }, {});
 
@@ -55,11 +60,13 @@ export default class Mapping {
    * @return {Array}           Hubspot properties array
    */
   getHubspotProperties(segments, userData) {
-    const contactProps = _.reduce(this.map, (props, prop) => {
-      // TODO: the upstream update of hubspot properties except hull segments is disabled:
-      return []; // eslint-disable-next-line no-unreachable
-      const value = _.get(userData, prop.hull) || _.get(userData, `traits_${prop.hull}`);
-      if (value && !prop.read_only) {
+    const contactProps = _.reduce(this.map.to_hubspot, (props, prop) => {
+      let value = _.get(userData, prop.hull) || _.get(userData, `traits_${prop.hull}`);
+      if (/_at$|date$/.test(prop.hull)) {
+        const dateValue = new Date(value).getTime();
+        if (dateValue) value = dateValue;
+      }
+      if (value && prop.read_only != false) {
         props.push({
           property: prop.name,
           value
@@ -67,8 +74,8 @@ export default class Mapping {
       }
       return props;
     }, []);
-    const userSegments = userData.segment_ids || [];
 
+    const userSegments = userData.segment_ids || [];
     const segmentNames = userSegments.map(segmentId => {
       return _.trim(_.get(_.find(segments, { id: segmentId }), "name"));
     });

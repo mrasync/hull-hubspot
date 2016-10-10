@@ -44,8 +44,10 @@ export default class UserUpdateStrategy {
       return Promise.resolve();
     }
     const message = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup()
-      .catch((err) => req.hull.client.logger.error("Error in creating segments property", err));
+    return req.shipApp.hubspotAgent.syncContactProperties()
+      .catch((err) => {
+        req.hull.client.logger.error("Error in creating segments property", err.message);
+      });
   }
 
   segmentUpdateHandler(payload, { req }) {
@@ -54,7 +56,7 @@ export default class UserUpdateStrategy {
       return Promise.resolve();
     }
     const segment = payload.message;
-    return req.shipApp.hubspotAgent.syncHullGroup()
+    return req.shipApp.hubspotAgent.syncContactProperties()
       .then(() => {
         return req.shipApp.hullAgent.requestExtract({ segment });
       });
@@ -68,7 +70,7 @@ export default class UserUpdateStrategy {
     // TODO: if the segment would have `query` param we could trigger an extract
     // for deleted segment, for now we need to trigger an extract for all userbase
     const segment = payload.message; // eslint-disable-line no-unused-vars
-    return req.shipApp.hubspotAgent.syncHullGroup()
+    return req.shipApp.hubspotAgent.syncContactProperties()
       .then(() => {
         const segments = req.hull.ship.private_settings.synchronized_segments || [];
         if (segments.length === 0) {

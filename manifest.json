@@ -1,12 +1,16 @@
 {
   "name": "Hubspot",
   "description": "Sync a Hubspot Channel whenever a User enters or leaves a Segment",
-  "tags": ["outgoing", "incoming", "batch", "oneColumn"],
-  "admin" : "/auth/",
   "picture": "picture.png",
   "version": "0.0.1",
+  "tags": [
+    "outgoing",
+    "incoming",
+    "batch",
+    "oneColumn"
+  ],
   "settings": [],
-  "private_settings":[
+  "private_settings": [
     {
       "name": "synchronized_segments",
       "title": "Segments",
@@ -14,6 +18,38 @@
       "default": [],
       "type": "array",
       "format": "segment"
+    },
+    {
+      "name": "sync_fields_to_hubspot",
+      "title": "Custom Fields Sync (Hull to Hubspot)",
+      "type": "array",
+      "format": "trait"
+    },
+    {
+      "name": "sync_fields_to_hull",
+      "title": "Custom Fields Sync (Hubspot to Hull)",
+      "type": "array",
+      "format": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Hubspot Field ID",
+            "type": "string",
+            "format": "string"
+          },
+          "hull": {
+            "title": "Hull Field ID",
+            "type": "string",
+            "format": "trait",
+            "options": {
+              "placeholder": "Enter a Hull field id",
+              "allowCreate": true,
+              "source": "hubspot"
+            }
+          }
+        }
+      }
     },
     {
       "name": "token",
@@ -50,38 +86,12 @@
       "type": "boolean",
       "default": false,
       "format": "hidden"
-    },
-    {
-      "name": "additional_sync_fields",
-      "title": "Custom Fields Sync (Hubspot to Hull)",
-      "type": "array",
-      "format": "table",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Hubspot Field ID",
-            "type": "string",
-            "format": "string"
-          },
-          "hull": {
-            "title": "Hull Field ID",
-            "type": "string",
-            "format": "trait",
-            "pattern": "^[0-9a-zA-Z_]+$",
-            "options": {
-              "source": "hubspot",
-              "placeholder": "Enter a Hull field id",
-              "allowCreate": true
-            }
-          }
-        }
-      }
     }
   ],
   "deployment_settings": [],
   "resources": [],
   "readme": "readme.md",
+  "admin": "/auth/",
   "ui": false,
   "subscriptions": [
     {
@@ -92,12 +102,12 @@
     {
       "url": "/sync",
       "type": "cron",
-      "value": "0 * * * *"
+      "value": "*/5 * * * *"
     },
     {
       "url": "/monitor/checkToken",
       "type": "cron",
-      "value": "0 * * * *"
+      "value": "*/5 * * * *"
     }
- ]
+  ]
 }
