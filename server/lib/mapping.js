@@ -33,11 +33,16 @@ export default class Mapping {
    */
   getHullTraits(userData) {
     const hullTraits = _.reduce(this.map.to_hull, (traits, prop) => {
-      let val = _.get(userData, `properties[${prop.name}].value`);
-      if (prop.type === "number") {
-        val = parseFloat(val);
+      if (userData.properties && userData.properties.hasOwnProperty(prop.name)) {
+        let val = _.get(userData, `properties[${prop.name}].value`);
+        if (prop.type === "number") {
+          const numVal = parseFloat(val);
+          if (!isNaN(val)) {
+            val = numVal;
+          }
+        }
+        traits[prop.hull] = val;
       }
-      traits[prop.hull] = val;
       return traits;
     }, {});
 
