@@ -35,6 +35,7 @@ export default class UsersController {
           };
         });
         req.shipApp.instrumentationAgent.metricVal("send_users", body.length, req.hull.ship);
+        console.warn('---- batchUsers', JSON.stringify(body));
         return req.shipApp.hubspotAgent.batchUsers(body);
       })
       .then(res => {
