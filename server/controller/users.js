@@ -29,7 +29,6 @@ export default class UsersController {
       .then(segments => {
         const body = users.map((user) => {
           const properties = req.shipApp.mapping.getHubspotProperties(segments, user);
-          console.warn('--- bacth user ', user.email, JSON.stringify(properties));
           return {
             email: user.email,
             properties

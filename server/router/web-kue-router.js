@@ -12,7 +12,7 @@ function auth(pass) {
   return (req, res, next) => {
     const user = basicAuth(req) || {};
 
-    if (user.pass != pass) {
+    if (user.pass !== pass) {
       res.set("WWW-Authenticate", "Basic realm=Authorization Required");
       return res.send(401);
     }
