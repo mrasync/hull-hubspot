@@ -33,7 +33,7 @@ export default class Mapping {
    */
   getHullTraits(userData) {
     const hullTraits = _.reduce(this.map.to_hull, (traits, prop) => {
-      if (userData.properties && userData.properties.hasOwnProperty(prop.name)) {
+      if (userData.properties && _.has(userData.properties, prop.name)) {
         let val = _.get(userData, `properties[${prop.name}].value`);
         if (prop.type === "number") {
           const numVal = parseFloat(val);
@@ -66,7 +66,7 @@ export default class Mapping {
         const dateValue = new Date(value).getTime();
         if (dateValue) value = dateValue;
       }
-      if (value && prop.read_only != false) {
+      if (value && prop.read_only !== false) {
         props.push({
           property: prop.name,
           value

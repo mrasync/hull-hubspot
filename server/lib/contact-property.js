@@ -55,7 +55,7 @@ export default class ContactProperty {
   }
 
   ensureHullGroup(groups) {
-    const group =_.find(groups, g => g.name === "hull");
+    const group = _.find(groups, g => g.name === "hull");
     if (group) return Promise.resolve(group);
     return this.hubspot
               .post("/contacts/v2/groups")
@@ -67,7 +67,7 @@ export default class ContactProperty {
   }
 
   ensureCustomProperties(propertiesList, group = {}) {
-    const groupProperties = (group.properties || []).reduce((props,prop) => {
+    const groupProperties = (group.properties || []).reduce((props, prop) => {
       return Object.assign(props, { [prop.name]: prop });
     }, {});
     return Promise.all(propertiesList.map(this.ensureProperty.bind(this, groupProperties)))
@@ -75,7 +75,7 @@ export default class ContactProperty {
   }
 
   shouldUpdateProperty(currentValue, newValue) {
-    if (newValue.name === 'hull_segments') {
+    if (newValue.name === "hull_segments") {
       const currentSegmentNames = (currentValue.options || []).map(o => o.label).sort();
       const newSegmentNames = (newValue.options || []).map(o => o.label).sort();
       return !_.isEqual(currentSegmentNames, newSegmentNames);
@@ -91,37 +91,36 @@ export default class ContactProperty {
                   .put(`/contacts/v2/properties/named/${property.name}`)
                   .send(property)
                   .then(res => res.body);
-      } else {
-        return Promise.resolve(exists);
       }
-    } else {
-      return this.hubspot
-                .post("/contacts/v2/properties")
-                .send(property)
-                .then(res => res.body);
+      return Promise.resolve(exists);
     }
+
+    return this.hubspot
+              .post("/contacts/v2/properties")
+              .send(property)
+              .then(res => res.body);
   }
 
   getPropertiesList({ properties, segments }) {
     return [
-        this.getHullSegmentsProperty(segments)
-      ]
+      this.getHullSegmentsProperty(segments)
+    ]
       .concat(properties.map(({ type, title, id, path = [] }, displayOrder) => {
-      const name = `hull_${id.replace(/^traits_/, '').replace(/\//g, '_')}`;
-      const label = path.concat(title).join(" ");
+        const name = `hull_${id.replace(/^traits_/, "").replace(/\//g, "_")}`;
+        const label = path.concat(title).join(" ");
 
-      const propType = TYPES_MAPPING[type] || TYPES_MAPPING.string;
+        const propType = TYPES_MAPPING[type] || TYPES_MAPPING.string;
 
-      return {
-        ...propType,
-        name,
-        label,
-        displayOrder,
-        calculated: false,
-        groupName: "hull",
-        formField: false
-      };
-    }));
+        return {
+          ...propType,
+          name,
+          label,
+          displayOrder,
+          calculated: false,
+          groupName: "hull",
+          formField: false
+        };
+      }));
   }
 
   getHullSegmentsProperty(segments = []) {

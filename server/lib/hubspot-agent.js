@@ -159,13 +159,13 @@ export default class HubspotAgent {
         return this.hubspotClient.get("/contacts/v2/groups").query({ includeProperties: true });
       }),
       this.hullAgent.getAvailableProperties()
-    ]).then(([ segments = [], groupsResponse = {}, hullProperties = {} ]) => {
+    ]).then(([segments = [], groupsResponse = {}, hullProperties = {}]) => {
       const groups = (groupsResponse && groupsResponse.body) || [];
       const properties = _.values(_.pick(hullProperties, customProps));
       return ContactProperty.sync(this.hubspotClient, {
         segments, groups, properties, logger: this.hullClient.logger
       });
-    })
+    });
   }
 
 

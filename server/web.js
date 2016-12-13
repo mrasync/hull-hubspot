@@ -25,7 +25,7 @@ if (instrumentationAgent.raven) {
 app.use("/", WebAppRouter({ ...controllers, Hull, hostSecret, queueAdapter, shipCache, instrumentationAgent }))
   .use("/", WebStaticRouter({ Hull }))
   .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret, shipCache, instrumentationAgent }))
-  .use("/kue", WebKueRouter({ hostSecret, queueAdapter }))
+  .use("/kue", WebKueRouter({ hostSecret, queueAdapter }));
 
 if (instrumentationAgent.raven) {
   app.use(raven.middleware.express.errorHandler(instrumentationAgent.raven));

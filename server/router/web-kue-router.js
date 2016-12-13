@@ -3,30 +3,30 @@ import basicAuth from "basic-auth";
 import ui from "kue-ui";
 
 ui.setup({
-  apiURL: '/kue/_api', // IMPORTANT: specify the api url
-  baseURL: '/kue', // IMPORTANT: specify the base url
+  apiURL: "/kue/_api", // IMPORTANT: specify the api url
+  baseURL: "/kue", // IMPORTANT: specify the base url
   updateInterval: 5000 // Optional: Fetches new data every 5000 ms
 });
 
 function auth(pass) {
   return (req, res, next) => {
-    var user = basicAuth(req) || {};
+    const user = basicAuth(req) || {};
 
     if (user.pass != pass) {
-      res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+      res.set("WWW-Authenticate", "Basic realm=Authorization Required");
       return res.send(401);
-    };
+    }
 
     return next();
-  }
-};
+  };
+}
 
-export default function({ hostSecret, queueAdapter }) {
+export default function ({ hostSecret, queueAdapter }) {
   const router = Router();
 
   router.use(auth(hostSecret));
   router.use("/_api", queueAdapter.app);
-  router.use("/", ui.app);;
+  router.use("/", ui.app);
 
   return router;
 }
