@@ -22,8 +22,6 @@ if (instrumentationAgent.raven) {
   app.use(raven.middleware.express.requestHandler(instrumentationAgent.raven));
 }
 
-
-
 app.use("/", WebAppRouter({ ...controllers, Hull, hostSecret, queueAdapter, shipCache, instrumentationAgent }))
   .use("/", WebStaticRouter({ Hull }))
   .use("/", WebOauthRouter({ Hull, hostSecret, clientID, clientSecret, shipCache, instrumentationAgent }))

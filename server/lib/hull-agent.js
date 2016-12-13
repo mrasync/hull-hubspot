@@ -22,8 +22,8 @@ function getProperties(raw, path, id_path) {
     } else if (node.children) {
       const path_id = node.ship_id || node.app_id || node.platform_id || node.resource_id || title;
 
-      const lpath = (path || []).concat([ title ]);
-      const ipath = (id_path || []).concat([ path_id ]);
+      const lpath = (path || []).concat([title]);
+      const ipath = (id_path || []).concat([path_id]);
       const result = getProperties(node.children, lpath, ipath);
       node.children = result.tree;
       Object.assign(properties, result.properties);
@@ -32,13 +32,8 @@ function getProperties(raw, path, id_path) {
     tree.push(node);
   });
 
-  return {
-    properties: properties,
-    tree: tree
-  }
+  return { properties, tree };
 }
-
-
 
 export default class HullAgent {
   constructor(ship, hullClient, mapping, query, hostname, shipCache) {
@@ -76,7 +71,7 @@ export default class HullAgent {
    */
   getAvailableProperties() {
     return this.hullClient
-      .get('search/user_reports/bootstrap')
+      .get("search/user_reports/bootstrap")
       .then(({ tree }) => getProperties(tree).properties);
   }
 
@@ -89,12 +84,11 @@ export default class HullAgent {
   saveContacts(contacts) {
     this.hullClient.logger.info("saveContacts", contacts.length);
     return Promise.all(contacts.map((c) => {
-      const email = _.get(_.find(c["identity-profiles"][0].identities, { type: "EMAIL" }), "value");
-      if (!email) {
+      const traits = this.mapping.getHullTraits(c);
+      if (!traits.email) {
         return "";
       }
-      const traits = this.mapping.getHullTraits(c);
-      return this.hullClient.as({ email }).traits(traits);
+      return this.hullClient.as({ email: traits.email }).traits(traits);
     }));
   }
 
