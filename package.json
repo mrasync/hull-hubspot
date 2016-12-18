@@ -26,7 +26,7 @@
     "build:server": "./node_modules/.bin/babel server -d build",
     "start": "./node_modules/.bin/nf start",
     "start:dev": "./node_modules/.bin/nf -j Procfile.dev start",
-    "test": "npm run test:lint && npm run test:modules",
+    "test": "mocha --require babel-register  tests/**/*.js",
     "test:lint": "eslint server",
     "test:modules": "npm outdated --depth=0",
     "clean": "./node_modules/.bin/rimraf dist; ./node_modules/.bin/rimraf build",
@@ -45,9 +45,11 @@
   ],
   "devDependencies": {
     "babel-watch": "^2.0.2",
+    "chai": "^3.5.0",
     "eslint": "^3.2.2",
     "eslint-config-airbnb-base": "^5.0.1",
     "eslint-plugin-import": "^1.12.0",
+    "mocha": "^3.2.0",
     "updtr": "^0.2.1"
   },
   "dependencies": {

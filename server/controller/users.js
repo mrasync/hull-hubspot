@@ -1,5 +1,9 @@
-import _ from "lodash";
 import Promise from "bluebird";
+
+import {collectValidUsers, collectUsersProperties} from "../helpers/users";
+import {log, info, warn} from "../helpers/log";
+import {SEND_USERS_JOB_OK_LIMIT} from "../constants";
+
 
 export default class UsersController {
   /**
@@ -13,47 +17,13 @@ export default class UsersController {
    * @return {Promise}
    */
   sendUsersJob(req) {
-    const users = (req.payload.users || []).filter(u => !_.isEmpty(u.email));
-
+    const users = collectValidUsers(this._getUsers(req));
     if (users.length === 0) {
-      return req.hull.client.logger.log("skip psendUsersJob - empty users list");
+      return this._skip(req);
     }
-
-    req.hull.client.logger.log("sendUsersJob", { count_users: users.length });
-
-    if (users.length > 100) {
-      req.hull.client.logger.warn("sendUsersJob works best for under 100 users at once", users.length);
+    else {
+      return this._processUsers(req, users);
     }
-
-    return req.shipApp.hullAgent.getSegments()
-      .then(segments => {
-        const body = users.map((user) => {
-          const properties = req.shipApp.mapping.getHubspotProperties(segments, user);
-          return {
-            email: user.email,
-            properties
-          };
-        });
-        req.shipApp.instrumentationAgent.metricVal("send_users", body.length, req.hull.ship);
-        return req.shipApp.hubspotAgent.batchUsers(body);
-      })
-      .then(res => {
-        if (res === null) {
-          return Promise.resolve();
-        }
-
-        const { statusCode, body } = res;
-
-        if (statusCode === 202) {
-          return Promise.resolve();
-        }
-
-        console.warn("Error in sendUsersJob", { statusCode, body });
-        return Promise.reject(new Error("Error in create/update batch"));
-      }, (err) => {
-        req.hull.client.logger.info("Hubspot batch error", err);
-        return Promise.reject(err);
-      });
   }
 
   /**
@@ -66,5 +36,74 @@ export default class UsersController {
     const contacts = req.payload.contacts;
     req.shipApp.instrumentationAgent.metricVal("save_contact", contacts.length, req.hull.ship);
     return req.shipApp.hullAgent.saveContacts(contacts);
+  }
+
+  _getUsers(req) {
+    return req.payload.users || [];
+  }
+
+  _processUsers(req, users) {
+    this._logSendUsersJob(req, users);
+    this._checkUserOKLimit(req, users.length);
+    return this._getSegments(req)
+      .then(segments => this._processSegments(req, segments, users))
+      .then(
+        res => this._processResponseOK(req, res),
+        err => this._processResponseError(req, err)
+      );
+  }
+
+  _getSegments(req) {
+    return req.shipApp.hullAgent.getSegments();
+  }
+
+  _processSegments(req, segments, users) {
+    const getProperties = req.shipApp.mapping.getHubspotProperties.bind(null, segments);
+    const body = collectUsersProperties(users, getProperties);
+    req.shipApp.instrumentationAgent.metricVal("send_users", body.length, req.hull.ship);
+    return req.shipApp.hubspotAgent.batchUsers(body);
+  }
+
+  _processResponseOK(req, res) {
+    if (res === null) {
+      return Promise.resolve();
+    }
+
+    const { statusCode, body } = res;
+
+    if (statusCode === 202) {
+      return Promise.resolve();
+    }
+
+    this._logError(req, statusCode, body);
+    return Promise.reject(new Error("Error in create/update batch"));
+  }
+
+  _processResponseError(req, err) {
+    this._logBatchError(req, err);
+    return Promise.reject(err);
+  }
+
+  _skip(req) {
+    log(req, "skip sendUsersJob - empty users list");
+    return Promise.resolve();
+  }
+
+  _logSendUsersJob(req, users) {
+    log(req, "sendUsersJob", { count_users: users.length });
+  }
+
+  _checkUserOKLimit(req, userCount) {
+    if (userCount > SEND_USERS_JOB_OK_LIMIT) {
+      warn(req, `sendUsersJob works best for under ${SEND_USERS_JOB_OK_LIMIT} users at once`, userCount);
+    }
+  }
+
+  _logError(req, statusCode, body) {
+    warn(req, "Error in sendUsersJob", { statusCode, body });
+  }
+
+  _logBatchError(req, err) {
+    info(req, "Hubspot batch error", err);
   }
 }
