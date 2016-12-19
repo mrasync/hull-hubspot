@@ -2,7 +2,9 @@
   "parser": "babel-eslint",
   "globals": {},
   "env": {
-    "es6": true
+    "es6": true,
+    "node": true,
+    "mocha": true
   },
   "rules": {
     "comma-dangle": [0],
@@ -15,7 +17,10 @@
     "arrow-body-style" : [0],
     "no-param-reassign" : [0],
     "no-console": [0],
-    "eqeqeq": [1]
+    "eqeqeq": [1],
+    "no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_"
+    }]
   },
   "extends": "airbnb-base"
 }

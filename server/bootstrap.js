@@ -3,7 +3,8 @@ import { ShipCache } from "hull";
 
 import BatchController from "./controller/batch";
 import MonitorController from "./controller/monitor";
-import UsersController from "./controller/users";
+import saveContactsJob from "./controller/save-contacts-job";
+import sendUsersJob from "./controller/send-users-job";
 import FetchAllController from "./controller/fetch-all";
 import SyncController from "./controller/sync";
 import NotifyController from "./controller/notify";
@@ -30,9 +31,10 @@ const controllers = {
   batchController: new BatchController(),
   monitorController: new MonitorController(),
   fetchAllController: new FetchAllController(),
-  usersController: new UsersController(),
   notifyController: new NotifyController(),
-  syncController: new SyncController()
+  syncController: new SyncController(),
+  saveContactsJob,
+  sendUsersJob,
 };
 
 export default { queueAdapter, controllers, instrumentationAgent, shipCache };

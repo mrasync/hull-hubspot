@@ -1,46 +1,49 @@
-import {assert} from 'chai';
+import { assert } from "chai";
 
-import UsersController from '../../server/controller/users';
+import sendUsersJob from "../../server/controller/send-users-job";
 
 
 function makeInstrumentationAgent() {
   return {
     calls: [],
-    metricVal: function (...args) {
+    metricVal(...args) {
       this.calls.push(args);
     }
-  }
+  };
 }
 
 function makeMapping() {
   return {
-    getHubspotProperties: function (segments, user) {
+    getHubspotProperties(_segments, _user) {
       return {
         example: 123
-      }
+      };
     }
-  }
+  };
 }
 
-function makeHubspotAgent(res, err=null) {
+function makeSuccessResponse() {
+  return {
+    statusCode: 202,
+    body: ""
+  };
+}
+
+function makeHubspotAgent(res, err = null) {
   return {
     batchUsersCalled: false,
-    batchUsers: function (body) {
+    batchUsers(_body) {
       this.batchUsersCalled = true;
       if (err !== null) {
         return Promise.reject(err);
-      }
-      else if (res === undefined) {
+      } else if (res === undefined) {
         return Promise.resolve(makeSuccessResponse());
-      }
-      else if (res === null) {
+      } else if (res === null) {
         return Promise.resolve(null);
       }
-      else {
-        return Promise.resolve(res);
-      }
+      return Promise.resolve(res);
     }
-  }
+  };
 }
 
 function makeFakeLogger() {
@@ -48,24 +51,24 @@ function makeFakeLogger() {
     infoCalls: [],
     warnCalls: [],
     logCalls: [],
-    warn: function (...args) {
+    warn(...args) {
       this.warnCalls.push(args);
     },
-    info: function (...args) {
+    info(...args) {
       this.infoCalls.push(args);
     },
-    log: function (...args) {
-      this.logCalls.push(args)
+    log(...args) {
+      this.logCalls.push(args);
     }
-  }
+  };
 }
 
 function makeHullAgent() {
   return {
-    getSegments: function () {
-      return Promise.resolve('test-segments');
+    getSegments() {
+      return Promise.resolve("test-segments");
     }
-  }
+  };
 }
 
 function makeFakeRequest() {
@@ -85,98 +88,85 @@ function makeFakeRequest() {
         logger: makeFakeLogger()
       }
     },
-    setHubspotAgent: function (hubspotAgent) {
+    setHubspotAgent(hubspotAgent) {
       this.shipApp.hubspotAgent = hubspotAgent;
     }
-  }
+  };
 }
 
-function skipped(req) {
-  console.log(req.shipApp.hubspotAgent);
-  return !req.shipApp.hubspotAgent.batchUsersCalled;
-}
-
-function makeSuccessResponse() {
-  return {
-    statusCode: 202,
-    body: ""
-  }
-}
 
 function dontCall() {
   assert.isOk(false);
 }
 
-describe('UsersController', () => {
-  const controller = new UsersController();
-
-  describe('#sendUsersJob()', () => {
-    it('skip job if no users', () => {
+describe("UsersController", () => {
+  describe("#sendUsersJob()", () => {
+    it("skip job if no users", () => {
       const req = makeFakeRequest();
-      controller.sendUsersJob(req).then(() => {
-        assert.isOk(!req.shipApp.hubspotAgent.batchUsersCalled)
+      sendUsersJob(req).then(() => {
+        assert.isOk(!req.shipApp.hubspotAgent.batchUsersCalled);
       });
     });
 
-    it('skip job if no valid users', () => {
+    it("skip job if no valid users", () => {
       const req = makeFakeRequest();
-      req.payload = {users: [
-        {name: 'roberto', email: null}
-      ]};
-      controller.sendUsersJob(req).then(() => {
-        assert.isOk(!req.shipApp.hubspotAgent.batchUsersCalled)
+      req.payload = { users: [
+        { name: "roberto", email: null }
+      ] };
+      sendUsersJob(req).then(() => {
+        assert.isOk(!req.shipApp.hubspotAgent.batchUsersCalled);
       }, dontCall);
     });
 
-    it('doesnt skip job if any valid users', () => {
+    it("doesnt skip job if any valid users", () => {
       const req = makeFakeRequest();
-      req.payload = {users: [
-        {name: 'roberto', email: 'roberto@example.com'},
-        {name: 'foo', email: null},
-      ]};
-      controller.sendUsersJob(req).then(() => {
+      req.payload = { users: [
+        { name: "roberto", email: "roberto@example.com" },
+        { name: "foo", email: null },
+      ] };
+      sendUsersJob(req).then(() => {
         assert.isOk(req.shipApp.hubspotAgent.batchUsersCalled);
       }, dontCall);
     });
 
-    it('analyze batch response when bad status', () => {
+    it("analyze batch response when bad status", () => {
       const req = makeFakeRequest();
-      req.payload = {users: [
-        {name: 'roberto', email: 'roberto@example.com'},
-        {name: 'foo', email: null},
-      ]};
+      req.payload = { users: [
+        { name: "roberto", email: "roberto@example.com" },
+        { name: "foo", email: null },
+      ] };
       req.setHubspotAgent(makeHubspotAgent({
         statusCode: 100,
-        body: ''
+        body: ""
       }));
-      controller.sendUsersJob(req).then(dontCall,
+      sendUsersJob(req).then(dontCall,
         (err) => {
-          assert.equal(err.message, 'Error in create/update batch');
+          assert.equal(err.message, "Error in create/update batch");
         }
       );
     });
 
-    it('analyze batch response when it is null', () => {
+    it("analyze batch response when it is null", () => {
       const req = makeFakeRequest();
-      req.payload = {users: [
-        {name: 'roberto', email: 'roberto@example.com'},
-        {name: 'foo', email: null},
-      ]};
+      req.payload = { users: [
+        { name: "roberto", email: "roberto@example.com" },
+        { name: "foo", email: null },
+      ] };
       req.setHubspotAgent(makeHubspotAgent(null));
-      controller.sendUsersJob(req).then(() => {
+      sendUsersJob(req).then(() => {
         assert.isOk(true);
       }, dontCall);
     });
 
-    it('analyze batch error', () => {
+    it("analyze batch error", () => {
       const req = makeFakeRequest();
-      req.payload = {users: [
-        {name: 'roberto', email: 'roberto@example.com'},
-        {name: 'foo', email: null},
-      ]};
-      req.setHubspotAgent(makeHubspotAgent(null, new Error('Error123')));
-        controller.sendUsersJob(req).then(dontCall, (err) => {
-        assert.equal(err.message, 'Error123');
+      req.payload = { users: [
+        { name: "roberto", email: "roberto@example.com" },
+        { name: "foo", email: null },
+      ] };
+      req.setHubspotAgent(makeHubspotAgent(null, new Error("Error123")));
+      sendUsersJob(req).then(dontCall, (err) => {
+        assert.equal(err.message, "Error123");
       });
     });
   });

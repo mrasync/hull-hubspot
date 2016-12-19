@@ -45,7 +45,6 @@
   ],
   "devDependencies": {
     "babel-watch": "^2.0.2",
-    "chai": "^3.5.0",
     "eslint": "^3.2.2",
     "eslint-config-airbnb-base": "^5.0.1",
     "eslint-plugin-import": "^1.12.0",
@@ -64,6 +63,7 @@
     "bluebird": "^3.4.3",
     "body-parser": "^1.15.2",
     "cache-manager": "^2.1.2",
+    "chai": "^3.5.0",
     "connect": "^3.4.1",
     "connect-timeout": "^1.7.0",
     "csv-stream": "^0.1.3",
