@@ -1,9 +1,8 @@
 import Promise from "bluebird";
 
-import {collectValidUsers, collectUsersProperties} from "../helpers/users";
-import {log, info, warn} from "../helpers/log";
-import {SEND_USERS_JOB_OK_LIMIT} from "../constants";
-
+import { collectValidUsers, collectUsersProperties } from "../helpers/users";
+import { log, info, warn } from "../helpers/log";
+import { SEND_USERS_JOB_OK_LIMIT } from "../constants";
 
 export default class UsersController {
   /**
@@ -21,9 +20,7 @@ export default class UsersController {
     if (users.length === 0) {
       return this._skip(req);
     }
-    else {
-      return this._processUsers(req, users);
-    }
+    return this._processUsers(req, users);
   }
 
   /**
